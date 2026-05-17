@@ -606,12 +606,22 @@ main > :not(.section) { display: none !important; }
 .alert code { background: rgba(0,0,0,0.08); color: inherit; padding: 0.1em 0.35em; border-radius: 3px; }
 
 /* TABLE */
+.table-responsive {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  box-shadow: 0 1px 0 var(--border);
+}
 .fancy-table {
   width: 100%;
   border-collapse: collapse;
-  margin: 1.5rem 0;
+  margin: 0;
   border-radius: 12px;
   overflow: hidden;
+  min-width: 480px;
 }
 .fancy-table th {
   background: linear-gradient(135deg, var(--purple), var(--pink));
@@ -1095,12 +1105,107 @@ main > :not(.section) { display: none !important; }
   box-shadow: var(--glow-purple);
 }
 
+/* LIGHTBOX IMAGES */
+.img-lightbox[hidden] { display: none !important; }
+.img-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  background: rgba(20, 16, 10, 0.94);
+  align-items: center;
+  justify-content: center;
+  padding: 3.5rem 1rem 1rem;
+}
+.img-lightbox.open { display: flex; }
+.img-lightbox-inner {
+  position: relative;
+  max-width: min(96vw, 1200px);
+  max-height: 88vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-lightbox img {
+  max-width: min(96vw, 1200px);
+  max-height: 88vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  background: #fff;
+}
+.img-lightbox-caption {
+  position: absolute;
+  bottom: -2.2rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #f4efe4;
+  font-family: var(--font-note);
+  font-size: 0.9rem;
+}
+.img-lightbox-close {
+  position: fixed;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.75rem, env(safe-area-inset-right));
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  color: #1a1a1a;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  font-weight: 800;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.45);
+  z-index: 100001;
+}
+.img-lightbox-close:hover { background: var(--pink); color: #fff; }
+.summary-img-media,
+.summary-img-card .summary-img-media { cursor: zoom-in; }
+.summary-img-card { cursor: pointer; }
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
-  main { padding: 1rem; }
+  /* Spirale + marge rouge du cahier : masquées pour ne pas recouvrir le texte */
+  body::after { display: none !important; }
+  .hero::before,
+  .content-panel::before,
+  .notebook::before { display: none !important; }
+  .navbar {
+    margin-left: 0;
+    padding: 0.5rem 0.75rem;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  main {
+    margin-left: 0;
+    padding: 1rem 0.85rem;
+    max-width: 100%;
+  }
+  .hero {
+    margin: 0.75rem 0.5rem;
+    padding: 1.75rem 1rem;
+  }
+  .content-panel {
+    padding: 1rem 1rem !important;
+  }
+  .nav-btn { font-size: 0.72rem; padding: 0.35rem 0.65rem; }
+  .subtabs { gap: 0.35rem; }
+  .subtab { font-size: 0.75rem; padding: 0.4rem 0.85rem; }
   .compare-grid { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 3rem; }
+  .hero h1 { font-size: 2.4rem; }
   .grid-3 { grid-template-columns: 1fr; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .fancy-table { min-width: 420px; font-size: 0.8rem; }
+  .fancy-table th, .fancy-table td { padding: 0.55rem 0.65rem; }
+  .cli-sim-body { max-height: 240px; font-size: 0.72rem; }
+  .lab-tab { font-size: 0.75rem; padding: 0.4rem 0.65rem; }
+  .img-lightbox { padding: 3.75rem 0.5rem 0.5rem; }
+  .img-lightbox-close { width: 44px; height: 44px; font-size: 1.5rem; }
 }
 
 /* ANIMATIONS */
@@ -1281,15 +1386,32 @@ main > :not(.section) { display: none !important; }
   gap: 1.25rem;
   align-items: start;
 }
-@media (max-width: 900px) { .lab-sim-wrap { grid-template-columns: 1fr; } }
+@media (max-width: 900px) {
+  .lab-sim-wrap { grid-template-columns: 1fr; }
+  .lab-sim-sidebar { position: static; max-height: none; overflow: visible; }
+}
 
 .lab-sim-sidebar {
   background: var(--card);
   border: 2px dashed var(--border);
   border-radius: 6px;
   padding: 1rem;
-  position: sticky;
-  top: 5rem;
+  position: static;
+  z-index: 1;
+}
+.lab-sim-main {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+}
+@media (min-width: 901px) {
+  .lab-sim-sidebar {
+    position: sticky;
+    top: 1rem;
+    align-self: start;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+  }
 }
 .lab-sim-sidebar h4 {
   font-family: var(--font-hand);
@@ -1379,6 +1501,12 @@ main > :not(.section) { display: none !important; }
   color: #fff;
   padding: 0.35rem 0.5rem;
   caret-color: #86efac;
+  position: relative;
+  z-index: 5;
+  min-width: 0;
+}
+@media (max-width: 768px) {
+  .cli-input { font-size: 16px; }
 }
 .lab-sim-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
 .lab-sim-actions .btn { font-family: var(--font-note); font-size: 0.9rem; }
@@ -1565,7 +1693,6 @@ main > :not(.section) { display: none !important; }
     <div class="hero-pill" onclick="showSection('dns', this)">🔍 DNS</div>
     <div class="hero-pill" onclick="showSection('securite', this)">🛡️ Sécurité</div>
     <div class="hero-pill" onclick="showSection('lab', this)">🖥️ Labs CLI</div>
-    <button type="button" class="nav-btn" data-section="resumes" onclick="showSection('resumes', this)">📸 Résumés</button>
   </div>
   <button class="btn btn-primary" onclick="document.querySelector('.navbar').scrollIntoView({behavior:'smooth'})">Commencer à apprendre 🚀</button>
   <p class="hero-signature" aria-label="Auteur du cahier"><span>par</span> Tudert Sahraoui</p>
@@ -2290,7 +2417,6 @@ main > :not(.section) { display: none !important; }
 </div>
 
 <!-- ===== ETHERCHANNEL ===== -->
-<!-- ===== ETHERCHANNEL ===== -->
 <div class="section" id="section-etherchannel">
   <div class="section-header">
     <div class="section-title">🔗 EtherChannel</div>
@@ -2304,7 +2430,6 @@ main > :not(.section) { display: none !important; }
     <button class="subtab" onclick="showSubtab('eth','securite', this)">🛡️ Sécurité</button>
   </div>
 
-  <!-- ONGLE T1 : THEORIE -->
   <div class="subcontent active" id="eth-theorie">
     <div class="content-panel">
       <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--orange);margin-bottom:1rem;">🔗 C'est quoi l'EtherChannel ?</h3>
@@ -2352,12 +2477,8 @@ main > :not(.section) { display: none !important; }
     </div>
   </div>
 
-  <!-- ONGLET 2 : PROTOCOLES (LACP vs PAgP) -->
   <div class="subcontent" id="eth-protocoles">
     <div class="content-panel">
-      <!-- J'ai fusionné ton texte sur la répartition de charge ici au bon endroit -->
-      <div class="highlight" style="margin-bottom:1.5rem;"><strong>Répartition de charge :</strong> un flux = même paire (MAC ou IP selon <code>port-channel load-balance</code>). Plusieurs flux peuvent utiliser des liens différents ; <em>un seul</em> gros flux ne dépasse jamais la vitesse d'un membre (ex. 1 Gbps sur Po1 à 4×1G).</div>
-
       <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--purple);margin-bottom:1rem;">⚙️ LACP vs PAgP</h3>
 
       <div class="compare-grid">
@@ -2398,13 +2519,14 @@ main > :not(.section) { display: none !important; }
         </tbody>
       </table>
 
-      <div class="sticky-note green" style="max-width:400px; margin-top: 1rem;">
+      <div class="highlight" style="margin-top:1rem;"><strong>Répartition de charge :</strong> un flux = même paire (MAC ou IP selon <code>port-channel load-balance</code>). Plusieurs flux peuvent utiliser des liens différents ; <em>un seul</em> gros flux ne dépasse jamais la vitesse d'un membre (ex. 1 Gbps sur Po1 à 4×1G).</div>
+
+      <div class="sticky-note green" style="max-width:400px;">
         🎓 <strong>Recommandation :</strong> Utilise toujours <strong>LACP</strong> — c'est le standard ! PAgP ne fonctionne qu'entre switches Cisco. Évite "On" en production car pas de vérification.
       </div>
     </div>
   </div>
 
-  <!-- ONGLET 3 : CONFIGURATION -->
   <div class="subcontent" id="eth-config">
     <div class="content-panel">
       <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">💻 Configuration EtherChannel</h3>
@@ -2451,7 +2573,6 @@ main > :not(.section) { display: none !important; }
     </div>
   </div>
 
-  <!-- ONGLET 4 : SECURITE -->
   <div class="subcontent" id="eth-securite">
     <div class="content-panel">
       <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--red);margin-bottom:1rem;">🛡️ Sécurité EtherChannel</h3>
@@ -3243,7 +3364,7 @@ main > :not(.section) { display: none !important; }
         </div>
       </aside>
 
-      <div>
+      <div class="lab-sim-main">
         <div class="lab-objective" id="labObjective"></div>
         <div class="cli-sim">
           <div class="cli-sim-bar">
@@ -3270,46 +3391,51 @@ main > :not(.section) { display: none !important; }
     <p class="section-desc">Fiches visuelles de cours pour une révision rapide</p>
   </div>
 
+  <div class="alert alert-info" style="margin-bottom:1.25rem;">
+    <span class="alert-icon">📁</span>
+    <div>Placez vos fiches dans le dossier <code>fin/</code> : <code>img01.jpeg</code> à <code>img06.jpeg</code>. <strong>Cliquez sur une image pour l’agrandir</strong> — <strong>×</strong> ou Échap pour fermer.</div>
+  </div>
+
   <div class="summary-images">
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">🏷️</span><span>img01.jpeg</span></div>
-        <img src="img01.jpeg" alt="VLAN Configuration" onload="this.parentElement.classList.add('has-image')">
+        <img src="img01.jpeg" alt="VLAN Configuration" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">VLAN Configuration — VLAN 10,20,30,99</div>
     </div>
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">✨</span><span>img02.jpeg</span></div>
-        <img src="img02.jpeg" alt="Avantages VLAN" onload="this.parentElement.classList.add('has-image')">
+        <img src="img02.jpeg" alt="Avantages VLAN" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">Avantages des VLANs pour votre réseau</div>
     </div>
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">🌉</span><span>img03.jpeg</span></div>
-        <img src="img03.jpeg" alt="STP" onload="this.parentElement.classList.add('has-image')">
+        <img src="img03.jpeg" alt="STP" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">STP — Spanning Tree Protocol</div>
     </div>
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">🔗</span><span>img04.jpeg</span></div>
-        <img src="img04.jpeg" alt="EtherChannel" onload="this.parentElement.classList.add('has-image')">
+        <img src="img04.jpeg" alt="EtherChannel" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">EtherChannel — L'Agrégation Logique</div>
     </div>
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">📡</span><span>img05.jpeg</span></div>
-        <img src="img05.jpeg" alt="DHCP et DNS" onload="this.parentElement.classList.add('has-image')">
+        <img src="img05.jpeg" alt="DHCP et DNS" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">DHCP & DNS — Processus DORA + Résolution</div>
     </div>
     <div class="summary-img-card">
       <div class="summary-img-media">
         <div class="summary-img-placeholder"><span class="summary-img-emoji">🌍</span><span>img06.jpeg</span></div>
-        <img src="img06.jpeg" alt="DHCPv6" onload="this.parentElement.classList.add('has-image')">
+        <img src="img06.jpeg" alt="DHCPv6" onload="this.parentElement.classList.add('has-image');if(window.refreshSummaryImages)refreshSummaryImages()">
       </div>
       <div class="summary-img-label">DHCPv6 — Processus SARR + Types</div>
     </div>
@@ -3319,7 +3445,15 @@ main > :not(.section) { display: none !important; }
 
 </main>
 
-<script src="lab-simulator.js"></script>
+<div id="imgLightbox" class="img-lightbox" role="dialog" aria-modal="true" aria-label="Aperçu image" hidden>
+  <button type="button" class="img-lightbox-close" id="imgLightboxClose" aria-label="Fermer">&times;</button>
+  <div class="img-lightbox-inner">
+    <img id="imgLightboxImg" src="" alt="">
+    <p id="imgLightboxCaption" class="img-lightbox-caption"></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
 <script>
 // ===== NAVIGATION =====
 function showSection(id, el) {
@@ -3335,7 +3469,93 @@ function showSection(id, el) {
     ? el
     : document.querySelector('.navbar .nav-btn[data-section="' + id + '"]');
   if (navBtn) navBtn.classList.add('active');
-  if (id === 'lab' && typeof initLabSimulator === 'function') initLabSimulator();
+  if (id === 'lab' && typeof initLabSimulator === 'function') {
+    initLabSimulator();
+    setTimeout(() => {
+      const cli = document.getElementById('cliInput');
+      if (cli) cli.focus();
+    }, 150);
+  }
+}
+
+function wrapResponsiveTables() {
+  document.querySelectorAll('table.fancy-table').forEach(table => {
+    if (table.parentElement && table.parentElement.classList.contains('table-responsive')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'table-responsive';
+    table.parentNode.insertBefore(wrap, table);
+    wrap.appendChild(table);
+  });
+}
+
+function refreshSummaryImages() {
+  document.querySelectorAll('.summary-img-media img').forEach(im => {
+    if (im.complete && im.naturalWidth > 0) {
+      im.parentElement.classList.add('has-image');
+    }
+  });
+}
+window.refreshSummaryImages = refreshSummaryImages;
+
+function initImageLightbox() {
+  if (window._lightboxReady) return;
+  const box = document.getElementById('imgLightbox');
+  const img = document.getElementById('imgLightboxImg');
+  const caption = document.getElementById('imgLightboxCaption');
+  const closeBtn = document.getElementById('imgLightboxClose');
+  if (!box || !img || !closeBtn) return;
+  window._lightboxReady = true;
+
+  function openLightbox(src, alt, label) {
+    img.src = src;
+    img.alt = alt || '';
+    if (caption) caption.textContent = label || alt || '';
+    box.hidden = false;
+    box.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    box.classList.remove('open');
+    box.hidden = true;
+    img.src = '';
+    if (caption) caption.textContent = '';
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.summary-img-media').forEach(media => {
+    media.addEventListener('click', e => {
+      e.preventDefault();
+      const im = media.querySelector('img');
+      const card = media.closest('.summary-img-card');
+      const labelEl = card && card.querySelector('.summary-img-label');
+      const label = labelEl ? labelEl.textContent.trim() : '';
+      if (!im || !im.getAttribute('src')) return;
+      if (im.naturalWidth > 0) {
+        openLightbox(im.currentSrc || im.src, im.alt, label);
+      } else {
+        const test = new Image();
+        test.onload = () => {
+          media.classList.add('has-image');
+          openLightbox(test.src, im.alt, label);
+        };
+        test.onerror = () => {
+          alert('Image introuvable : placez le fichier dans le dossier « fin » (à côté de index.html).');
+        };
+        test.src = im.src;
+      }
+    });
+  });
+
+  closeBtn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    closeLightbox();
+  });
+  box.addEventListener('click', e => {
+    if (e.target === box || e.target.classList.contains('img-lightbox-inner')) closeLightbox();
+  });
+  img.addEventListener('click', e => e.stopPropagation());
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 }
 
 function formatTerminalBodies() {
@@ -3351,10 +3571,15 @@ function formatTerminalBodies() {
 }
 
 // ===== SUBTABS =====
+const SUBTAB_SECTION_IDS = { eth: 'etherchannel', sec: 'securite' };
+
 function showSubtab(section, tab, btn) {
+  const sectionId = SUBTAB_SECTION_IDS[section] || section;
   const prefix = section + '-';
-  document.querySelectorAll(`#section-${section} .subcontent`).forEach(c => c.classList.remove('active'));
-  document.querySelectorAll(`#section-${section} .subtab`).forEach(b => b.classList.remove('active'));
+  const root = document.getElementById('section-' + sectionId);
+  if (!root) return;
+  root.querySelectorAll('.subcontent').forEach(c => c.classList.remove('active'));
+  root.querySelectorAll('.subtab').forEach(b => b.classList.remove('active'));
   const content = document.getElementById(prefix + tab);
   if (content) content.classList.add('active');
   const activeBtn = (btn && btn.classList && btn.classList.contains('subtab'))
@@ -3403,6 +3628,9 @@ function showDoraDetail(step) {
 window.onload = () => {
   document.getElementById('heroSection').style.display = 'flex';
   formatTerminalBodies();
+  wrapResponsiveTables();
+  refreshSummaryImages();
+  initImageLightbox();
   if (typeof initLabSimulator === 'function') initLabSimulator();
 };
 </script>
