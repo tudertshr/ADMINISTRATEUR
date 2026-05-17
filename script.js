@@ -776,17 +776,23 @@
   function initLabSimulator() {
     const input = document.getElementById('cliInput');
     if (!input) return;
+
     if (!window._labSimInited) {
       window._labSimInited = true;
       input.addEventListener('keydown', e => {
         if (e.key === 'Enter') {
+          e.preventDefault();
           processCommand(input.value);
           input.value = '';
         }
       });
-      document.querySelectorAll('.lab-tab').forEach(tab => {
-        tab.addEventListener('click', () => selectLab(tab.dataset.lab));
-      });
+      const tabs = document.getElementById('labTabs');
+      if (tabs) {
+        tabs.addEventListener('click', e => {
+          const tab = e.target.closest('.lab-tab');
+          if (tab && tab.dataset.lab) selectLab(tab.dataset.lab);
+        });
+      }
       const devSel = document.getElementById('labDeviceSelect');
       if (devSel) {
         devSel.addEventListener('change', () => {
@@ -797,10 +803,18 @@
           renderObjective();
         });
       }
+    }
+
+    if (!window._labSimBooted) {
+      window._labSimBooted = true;
       selectLab('lab1');
     } else {
       renderChecklist();
       renderObjective();
+    }
+
+    if (document.getElementById('section-lab')?.classList.contains('active')) {
+      setTimeout(() => input.focus(), 80);
     }
   }
 
