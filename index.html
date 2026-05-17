@@ -1,0 +1,3410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌐 NetAcademy — Administration Réseaux</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Kalam:wght@400;700&family=Nunito:wght@400;600;700;800&family=Patrick+Hand&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #e879a9;
+  --purple: #9b7fd4;
+  --blue: #5b8fd9;
+  --cyan: #5bb5c9;
+  --green: #6aab6e;
+  --orange: #e8a04a;
+  --yellow: #fff3a8;
+  --red: #d45d5d;
+  --bg: #f4efe4;
+  --bg2: #faf6ee;
+  --bg3: #ebe4d4;
+  --card: #fffef9;
+  --card2: #fffdf5;
+  --border: rgba(60, 45, 30, 0.14);
+  --text: #2c2416;
+  --text2: #5c4f3a;
+  --paper: #fffef8;
+  --grid: rgba(147, 197, 253, 0.45);
+  --margin-red: #f87171;
+  --ink: #1e3a5f;
+  --highlight: #fef08a;
+  --highlight-pink: #fbcfe8;
+  --shadow-page: 4px 6px 24px rgba(44, 36, 22, 0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
+  --font-hand: 'Caveat', cursive;
+  --font-note: 'Patrick Hand', cursive;
+  --font-school: 'Kalam', cursive;
+  --glow-pink: 0 4px 14px rgba(232, 121, 169, 0.25);
+  --glow-blue: 0 4px 14px rgba(91, 143, 217, 0.25);
+  --glow-purple: 0 4px 14px rgba(155, 127, 212, 0.25);
+  --glow-cyan: 0 4px 14px rgba(91, 181, 201, 0.25);
+  --glow-green: 0 4px 14px rgba(106, 171, 110, 0.25);
+  --glow-orange: 0 4px 14px rgba(232, 160, 74, 0.25);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  cursor: default;
+  min-height: 100vh;
+}
+
+/* Fond papier + texture légère */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(255,255,255,0.6) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(235, 228, 212, 0.5) 0%, transparent 45%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Spirale carnet (côté gauche) */
+body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 28px;
+  z-index: 50;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(180deg,
+      transparent 0px, transparent 14px,
+      #d4c4a8 14px, #d4c4a8 16px,
+      transparent 16px, transparent 30px);
+  box-shadow: 2px 0 8px rgba(44,36,22,0.08);
+  border-right: 2px solid rgba(180, 160, 130, 0.4);
+}
+
+/* Masquer effets espace */
+.cursor, .cursor-trail, .stars, .float-emoji { display: none !important; }
+
+/* CUSTOM CURSOR */
+.cursor {
+  width: 20px; height: 20px;
+  background: var(--pink);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  transition: transform 0.1s, background 0.3s;
+  mix-blend-mode: screen;
+}
+.cursor-trail {
+  width: 8px; height: 8px;
+  background: var(--purple);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: left 0.15s, top 0.15s;
+  mix-blend-mode: screen;
+}
+
+/* STARS BACKGROUND */
+.stars {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle linear infinite;
+}
+@keyframes twinkle {
+  0%,100%{opacity:0.1;transform:scale(1);}
+  50%{opacity:1;transform:scale(1.5);}
+}
+
+/* FLOATING ELEMENTS */
+.float-emoji {
+  position: fixed;
+  font-size: 2rem;
+  pointer-events: none;
+  z-index: 1;
+  animation: floatUp linear infinite;
+  opacity: 0;
+}
+@keyframes floatUp {
+  0%{opacity:0;transform:translateY(0) rotate(0deg);}
+  10%{opacity:0.6;}
+  90%{opacity:0.3;}
+  100%{opacity:0;transform:translateY(-100vh) rotate(360deg);}
+}
+
+/* HERO — page de cahier */
+.hero {
+  position: relative;
+  z-index: 10;
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 2rem 3rem 3.5rem;
+  margin: 1.5rem 1.5rem 1.5rem 2.5rem;
+  background: var(--paper);
+  background-image:
+    repeating-linear-gradient(transparent, transparent 27px, var(--grid) 27px, var(--grid) 28px);
+  border-radius: 4px 12px 12px 4px;
+  box-shadow: var(--shadow-page);
+  border: 1px solid rgba(60,45,30,0.1);
+  animation: pageAppear 0.6s ease both;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  left: 52px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--margin-red);
+  opacity: 0.85;
+}
+@keyframes pageAppear {
+  from { opacity: 0; transform: translateY(12px) rotate(-0.3deg); }
+  to { opacity: 1; transform: translateY(0) rotate(0); }
+}
+
+.hero-badge {
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  color: white;
+  padding: 0.4rem 1.2rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--glow-pink);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.03);} }
+
+.hero h1 {
+  font-family: var(--font-hand);
+  font-size: clamp(3.2rem, 9vw, 5.5rem);
+  line-height: 1.05;
+  color: var(--ink);
+  margin-bottom: 1rem;
+  background: linear-gradient(transparent 60%, var(--highlight) 60%);
+  display: inline-block;
+  padding: 0 0.2em;
+}
+.hero-sub {
+  font-family: var(--font-note);
+  font-size: 1.25rem;
+  color: var(--text2);
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.65;
+}
+
+.hero-signature {
+  position: absolute;
+  right: 1.75rem;
+  bottom: 1.25rem;
+  font-family: var(--font-hand);
+  font-size: 0.95rem;
+  color: var(--text2);
+  opacity: 0.72;
+  transform: rotate(-2deg);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+.hero-signature span {
+  font-family: var(--font-note);
+  font-size: 0.72rem;
+  color: var(--text2);
+  opacity: 0.85;
+  margin-right: 0.35em;
+}
+
+.hero-cards {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+.hero-pill {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+.hero-pill:hover {
+  transform: translateY(-3px);
+  border-color: var(--pink);
+  box-shadow: var(--glow-pink);
+}
+
+/* NAV — intercalaires cahier */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg2);
+  border-bottom: 2px dashed var(--border);
+  padding: 0.7rem 1.5rem 0.7rem 3rem;
+  margin-left: 28px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  box-shadow: 0 4px 12px rgba(44,36,22,0.06);
+}
+.navbar::-webkit-scrollbar { display: none; }
+.nav-logo {
+  font-family: var(--font-hand);
+  font-size: 1.65rem;
+  color: var(--ink);
+  white-space: nowrap;
+  margin-right: 0.8rem;
+  background: linear-gradient(transparent 55%, var(--highlight-pink) 55%);
+  padding: 0 0.15em;
+}
+.nav-btn {
+  background: var(--card);
+  border: 2px solid var(--border);
+  color: var(--text2);
+  padding: 0.35rem 0.9rem;
+  border-radius: 4px 4px 0 0;
+  font-family: var(--font-note);
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s;
+  transform: translateY(2px);
+  box-shadow: 0 -2px 0 rgba(44,36,22,0.05);
+}
+.nav-btn:hover, .nav-btn.active {
+  background: var(--highlight);
+  border-color: var(--orange);
+  color: var(--ink);
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(44,36,22,0.1);
+}
+
+/* MAIN LAYOUT */
+main {
+  position: relative;
+  z-index: 10;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 2rem 2rem 3rem;
+  margin-left: 28px;
+}
+
+/* SECTION */
+.section { display: none; animation: fadeIn 0.5s ease; }
+.section.active { display: block; }
+/* Évite l'affichage de blocs HTML orphelins (hors .section) sur toutes les pages */
+main > :not(.section) { display: none !important; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px);} to{opacity:1;transform:translateY(0);} }
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.section-title {
+  font-family: var(--font-hand);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  color: var(--ink);
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  background: linear-gradient(transparent 58%, var(--highlight) 58%);
+  padding: 0 0.25em;
+}
+.section-desc {
+  color: var(--text2);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* CARDS GRID */
+.grid { display: grid; gap: 1.5rem; }
+.grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.grid-3 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+
+/* MODULE CARD */
+.module-card {
+  background: var(--paper);
+  background-image: repeating-linear-gradient(transparent, transparent 27px, var(--grid) 27px, var(--grid) 28px);
+  border: 2px solid var(--border);
+  border-radius: 4px 10px 10px 4px;
+  padding: 1.8rem 1.8rem 1.8rem 2.5rem;
+  cursor: pointer;
+  transition: all 0.35s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-page);
+}
+.module-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 20px 20px 0 0;
+}
+.module-card.pink::before { background: linear-gradient(90deg, var(--pink), var(--purple)); }
+.module-card.blue::before { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
+.module-card.green::before { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+.module-card.orange::before { background: linear-gradient(90deg, var(--orange), var(--yellow)); }
+.module-card.purple::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+.module-card.red::before { background: linear-gradient(90deg, var(--red), var(--orange)); }
+
+.module-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(255,255,255,0.2);
+}
+.module-card.pink:hover { box-shadow: var(--glow-pink); }
+.module-card.blue:hover { box-shadow: var(--glow-blue); }
+.module-card.green:hover { box-shadow: var(--glow-green); }
+.module-card.orange:hover { box-shadow: var(--glow-orange); }
+.module-card.purple:hover { box-shadow: var(--glow-purple); }
+.module-card.red:hover { box-shadow: 0 0 20px rgba(239,68,68,0.4); }
+
+.card-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+.card-title {
+  font-family: var(--font-hand);
+  font-size: 1.55rem;
+  margin-bottom: 0.5rem;
+  color: var(--ink);
+}
+.card-desc { color: var(--text2); font-size: 0.9rem; line-height: 1.6; }
+.card-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+.tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.tag-pink { background: rgba(255,107,157,0.2); color: var(--pink); }
+.tag-blue { background: rgba(59,130,246,0.2); color: var(--blue); }
+.tag-green { background: rgba(34,197,94,0.2); color: var(--green); }
+.tag-orange { background: rgba(249,115,22,0.2); color: var(--orange); }
+.tag-purple { background: rgba(168,85,247,0.2); color: var(--purple); }
+.tag-red { background: rgba(239,68,68,0.2); color: var(--red); }
+
+/* CONTENT PANEL — feuille cahier */
+.content-panel {
+  background: var(--paper);
+  background-image: repeating-linear-gradient(transparent, transparent 27px, var(--grid) 27px, var(--grid) 28px);
+  border: 1px solid rgba(60,45,30,0.12);
+  border-radius: 4px 10px 10px 4px;
+  padding: 2rem 2rem 2rem 3.5rem;
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-page);
+  position: relative;
+  animation: pageAppear 0.45s ease both;
+}
+.content-panel::before {
+  content: '';
+  position: absolute;
+  left: 48px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--margin-red);
+  opacity: 0.75;
+}
+
+/* STICKY NOTES */
+.sticky-note {
+  background: #fef08a;
+  color: #422006;
+  padding: 1.2rem 1.5rem;
+  border-radius: 4px;
+  font-family: var(--font-note);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  border: 1px solid #ca8a04;
+  box-shadow: 3px 4px 12px rgba(44,36,22,0.12);
+  transform: rotate(-1.5deg);
+  position: relative;
+  transition: transform 0.3s;
+  margin: 1rem 0;
+}
+.sticky-note:hover { transform: rotate(0deg) scale(1.02); }
+.sticky-note::before {
+  content: '📌';
+  position: absolute;
+  top: -15px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+}
+.sticky-note.blue { background: #bfdbfe; color: #1e3a8a; border-color: #2563eb; transform: rotate(1deg); }
+.sticky-note.green { background: #bbf7d0; color: #14532d; border-color: #16a34a; transform: rotate(-0.5deg); }
+.sticky-note.pink { background: #fbcfe8; color: #831843; border-color: #db2777; transform: rotate(1.5deg); }
+.sticky-note.orange { background: #fed7aa; color: #7c2d12; border-color: #ea580c; transform: rotate(-1deg); }
+
+/* NOTEBOOK STYLE */
+.notebook {
+  background: #fff;
+  color: #1a1a2e;
+  border-radius: 8px;
+  padding: 2rem 2rem 2rem 4rem;
+  position: relative;
+  box-shadow: 4px 4px 20px rgba(0,0,0,0.5);
+  background-image: repeating-linear-gradient(
+    transparent, transparent 27px, #bfdbfe 27px, #bfdbfe 28px
+  );
+  line-height: 28px;
+  font-size: 0.9rem;
+  margin: 1.5rem 0;
+}
+.notebook::before {
+  content: '';
+  position: absolute;
+  left: 50px; top: 0; bottom: 0;
+  width: 2px;
+  background: #fca5a5;
+}
+.notebook::after {
+  content: '';
+  position: absolute;
+  left: 20px; top: 0; bottom: 0;
+  width: 30px;
+  background: linear-gradient(90deg, #fecaca, #fff9f9);
+  border-right: 2px solid #fca5a5;
+  border-radius: 8px 0 0 8px;
+}
+.notebook h4 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.4rem;
+  color: #6d28d9;
+  margin-bottom: 0.5rem;
+}
+
+/* CODE BLOCKS */
+.code-block {
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  position: relative;
+  overflow-x: auto;
+}
+.code-block::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 0; right: 0;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0 12px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.code-block pre {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.85;
+  color: #e8eef4;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+.code-block .cmd { color: #4ade80; }
+.code-block .comment { color: #6b7280; font-style: italic; }
+.code-block .keyword { color: #f0abfc; }
+.code-block .value { color: #fcd34d; }
+.code-block .string { color: #6ee7b7; }
+.code-block .prompt { color: var(--pink); font-weight: 700; }
+
+/* PROCESS STEPS */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.step {
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+  background: var(--card2);
+  border-radius: 14px;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+  animation: slideIn 0.4s ease forwards;
+  opacity: 0;
+}
+.step:hover { transform: translateX(8px); border-color: var(--pink); }
+@keyframes slideIn { to { opacity: 1; } }
+.step-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: white;
+}
+.step-num.pink { background: linear-gradient(135deg, var(--pink), var(--purple)); }
+.step-num.blue { background: linear-gradient(135deg, var(--blue), var(--cyan)); }
+.step-num.green { background: linear-gradient(135deg, var(--green), var(--cyan)); }
+.step-num.orange { background: linear-gradient(135deg, var(--orange), var(--yellow)); }
+.step-content h4 { font-size: 1rem; font-weight: 800; margin-bottom: 0.3rem; color: var(--ink); }
+.step-content p { font-size: 0.85rem; color: var(--text); line-height: 1.6; }
+
+/* ALERT BOXES */
+.alert {
+  border-radius: 12px;
+  padding: 1rem 1.4rem;
+  margin: 1rem 0;
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+.alert-icon { font-size: 1.3rem; flex-shrink: 0; }
+.alert-danger { background: #fee2e2; border: 1px solid #dc2626; color: #7f1d1d; }
+.alert-warning { background: #fef3c7; border: 1px solid #d97706; color: #78350f; }
+.alert-info { background: #dbeafe; border: 1px solid #2563eb; color: #1e3a8a; }
+.alert-success { background: #dcfce7; border: 1px solid #16a34a; color: #14532d; }
+.alert-tip { background: #f3e8ff; border: 1px solid #7c3aed; color: #4c1d95; }
+.alert code { background: rgba(0,0,0,0.08); color: inherit; padding: 0.1em 0.35em; border-radius: 3px; }
+
+/* TABLE */
+.fancy-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+.fancy-table th {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  color: white;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.fancy-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--card);
+}
+.fancy-table tr:hover td { background: var(--card2); }
+.fancy-table code {
+  font-family: 'Space Mono', monospace;
+  background: #ede9fe;
+  color: #4c1d95;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+/* DORA PROCESS ANIMATION */
+.dora-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.dora-step {
+  background: var(--card2);
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  position: relative;
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  opacity: 0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.dora-step:hover { transform: scale(1.05); }
+.dora-step:nth-child(1) { animation-delay: 0.1s; }
+.dora-step:nth-child(2) { animation-delay: 0.2s; }
+.dora-step:nth-child(3) { animation-delay: 0.3s; }
+.dora-step:nth-child(4) { animation-delay: 0.4s; }
+@keyframes bounceIn {
+  to { opacity: 1; }
+}
+.dora-letter {
+  font-family: 'Fredoka One', cursive;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+.dora-name {
+  font-weight: 800;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  color: white;
+}
+.dora-desc { font-size: 0.75rem; color: var(--text2); }
+
+/* SCENARIO SIMULATION */
+.scenario-box {
+  background: var(--bg2);
+  border: 2px solid var(--cyan);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  position: relative;
+  overflow: hidden;
+}
+.scenario-box::before {
+  content: '🎭 SCÉNARIO';
+  position: absolute;
+  top: 0; left: 0;
+  background: var(--cyan);
+  color: var(--bg);
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.3rem 1rem;
+  border-radius: 0 0 8px 0;
+  letter-spacing: 1px;
+}
+.scenario-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.3rem;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  margin-top: 0.5rem;
+}
+.scenario-chat { display: flex; flex-direction: column; gap: 0.8rem; margin: 1rem 0; }
+.msg {
+  max-width: 80%;
+  padding: 0.8rem 1.2rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.msg.attacker { background: #fee2e2; border: 1px solid #dc2626; color: #7f1d1d; align-self: flex-start; border-radius: 4px 16px 16px 16px; }
+.msg.system { background: #dbeafe; border: 1px solid #2563eb; color: #1e3a8a; align-self: flex-end; border-radius: 16px 4px 16px 16px; }
+.msg.info { background: #f3e8ff; border: 1px solid #7c3aed; color: #4c1d95; align-self: center; border-radius: 8px; text-align: center; font-style: italic; }
+.msg-label { font-size: 0.7rem; font-weight: 800; margin-bottom: 0.3rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* VULN BOX */
+.vuln-card {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: 14px;
+  padding: 1.2rem;
+  margin: 1rem 0;
+}
+.vuln-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.vuln-badge {
+  background: var(--red);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+.vuln-title { color: #fca5a5; font-weight: 800; }
+.fix-badge {
+  background: var(--green);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+}
+.vuln-fix { color: #86efac; font-size: 0.88rem; margin-top: 0.8rem; }
+.grid.grid-2 .vuln-card { margin: 0; }
+#section-securite .vuln-title { color: var(--ink); }
+#section-securite .vuln-fix { color: var(--text2); }
+
+/* QUIZ */
+.quiz-container {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 2rem;
+  border: 1px solid var(--border);
+  margin: 2rem 0;
+}
+.quiz-q {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.2rem;
+  margin-bottom: 1.2rem;
+  color: white;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 0.7rem; }
+.quiz-opt {
+  background: var(--card2);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  text-align: left;
+}
+.quiz-opt:hover { border-color: var(--purple); background: rgba(168,85,247,0.1); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(34,197,94,0.1); color: #86efac; }
+.quiz-opt.wrong { border-color: var(--red); background: rgba(239,68,68,0.1); color: #fca5a5; }
+.quiz-feedback {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  display: none;
+}
+.quiz-feedback.show { display: block; }
+.quiz-nav { display: flex; gap: 1rem; margin-top: 1.5rem; }
+.btn {
+  padding: 0.7rem 1.5rem;
+  border-radius: 100px;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-primary {
+  background: var(--highlight);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  font-family: var(--font-note);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.btn-primary:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+.btn-secondary {
+  background: var(--card2);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+
+/* PROTOCOL COMPARISON */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.compare-side {
+  background: var(--card2);
+  border-radius: 14px;
+  padding: 1.2rem;
+  border: 1px solid var(--border);
+}
+.compare-side h4 {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border);
+}
+.compare-side ul { list-style: none; }
+.compare-side li {
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* TOPOLOGY DIAGRAM */
+.topo-diagram {
+  background: var(--bg2);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  text-align: center;
+  border: 1px solid var(--border);
+  overflow-x: auto;
+}
+.topo-node {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.5rem;
+}
+.topo-icon {
+  width: 56px; height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  transition: transform 0.3s;
+}
+.topo-icon:hover { transform: scale(1.2) rotate(5deg); }
+.topo-label { font-size: 0.75rem; font-weight: 700; color: var(--text2); }
+.topo-line {
+  height: 2px;
+  flex: 1;
+  margin: 0 0.5rem;
+  position: relative;
+}
+.topo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* IMAGE GALLERY */
+.img-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.img-card {
+  background: var(--card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: all 0.3s;
+}
+.img-card:hover { transform: translateY(-5px); box-shadow: var(--glow-purple); }
+.img-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+}
+.img-card-info {
+  padding: 1rem;
+}
+.img-card-info h4 { font-size: 0.95rem; font-weight: 800; color: white; margin-bottom: 0.3rem; }
+.img-card-info p { font-size: 0.8rem; color: var(--text2); }
+
+/* TERMINAL */
+.terminal {
+  background: #000;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 1.5rem 0;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.terminal-bar {
+  background: #1c1c1e;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+.terminal-dot.red { background: #ff5f57; }
+.terminal-dot.yellow { background: #febc2e; }
+.terminal-dot.green { background: #28c840; }
+.terminal-title { font-size: 0.75rem; color: #888; margin-left: auto; margin-right: auto; font-family: 'Space Mono', monospace; }
+.terminal-body {
+  padding: 1.2rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: #a7f3a7;
+  min-height: 100px;
+}
+.terminal-body .term-line {
+  display: block;
+  margin-bottom: 0.15rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.terminal-body .term-line:empty,
+.terminal-body .term-line.term-gap { display: block; margin: 0; height: 0.4rem; border: none; }
+.terminal-body .term-line.term-gap:empty { height: 0.4rem; }
+.terminal-body .t-prompt { color: #f9a8d4; }
+.terminal-body .t-cmd { color: #f8fafc; }
+.terminal-body .t-out { color: #86efac; }
+.terminal-body .t-warn { color: #fde047; display: block; margin: 0.5rem 0 0.25rem; }
+.terminal-body .t-err { color: #fca5a5; }
+
+/* PROGRESS */
+.progress-bar {
+  background: var(--card2);
+  border-radius: 100px;
+  height: 8px;
+  overflow: hidden;
+  margin: 0.5rem 0;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(90deg, var(--pink), var(--purple));
+  animation: grow 1s ease forwards;
+}
+@keyframes grow { from { width: 0; } }
+
+/* TOOLTIP */
+.tooltip-wrap { position: relative; display: inline; }
+.tooltip-trigger {
+  border-bottom: 2px dashed var(--purple);
+  cursor: help;
+  color: #d8b4fe;
+}
+.tooltip-content {
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg3);
+  border: 1px solid var(--purple);
+  color: var(--text);
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  width: 220px;
+  line-height: 1.5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 50;
+  box-shadow: var(--glow-purple);
+}
+.tooltip-wrap:hover .tooltip-content { opacity: 1; }
+
+/* HIGHLIGHT BOX */
+.highlight {
+  background: #fff8e1;
+  border-left: 4px solid var(--orange);
+  border-radius: 0 8px 8px 0;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: #422006;
+}
+.highlight strong { color: #1c1917; }
+
+/* ACCORDION */
+.accordion { margin: 1rem 0; }
+.accordion-item {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+.accordion-header {
+  width: 100%;
+  background: var(--card2);
+  border: none;
+  color: var(--text);
+  padding: 1rem 1.2rem;
+  text-align: left;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s;
+}
+.accordion-header:hover { background: rgba(168,85,247,0.1); }
+.accordion-header.open { color: var(--pink); }
+.accordion-arrow { transition: transform 0.3s; }
+.accordion-header.open .accordion-arrow { transform: rotate(180deg); }
+.accordion-body {
+  display: none;
+  padding: 1.2rem;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text2);
+  background: var(--card);
+}
+.accordion-body.show { display: block; }
+
+/* CONFETTI */
+.confetti-piece {
+  position: fixed;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 9999;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0% { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+}
+
+/* SCORE DISPLAY */
+.score-display {
+  text-align: center;
+  padding: 2rem;
+}
+.score-circle {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--pink), var(--purple));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: 2.5rem;
+  color: white;
+  margin: 0 auto 1rem;
+  box-shadow: var(--glow-purple);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  main { padding: 1rem; }
+  .compare-grid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 3rem; }
+  .grid-3 { grid-template-columns: 1fr; }
+}
+
+/* ANIMATIONS */
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes bounceIn {
+  from { opacity: 0; transform: scale(0.8) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.wiggle:hover {
+  animation: wiggle 0.4s ease;
+}
+@keyframes wiggle {
+  0%,100%{transform:rotate(0deg);}
+  25%{transform:rotate(-5deg);}
+  75%{transform:rotate(5deg);}
+}
+
+/* SUBSECTION TABS */
+.subtabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.subtab {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 0.5rem 1.2rem;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.subtab:hover, .subtab.active {
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  border-color: transparent;
+  color: white;
+}
+.subcontent { display: none; }
+.subcontent.active { display: block; animation: fadeIn 0.4s ease; }
+
+/* MEMORY CARD GAME */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+.memory-card-wrap { perspective: 1000px; }
+.memory-card {
+  width: 100%;
+  aspect-ratio: 1;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+  cursor: pointer;
+}
+.memory-card.flipped { transform: rotateY(180deg); }
+.memory-front, .memory-back {
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.4rem;
+}
+.memory-front { background: linear-gradient(135deg, var(--purple), var(--pink)); color: white; font-size: 1.5rem; }
+.memory-back { background: var(--card2); border: 1px solid var(--border); transform: rotateY(180deg); color: var(--text); }
+.memory-card.matched .memory-back { background: rgba(34,197,94,0.2); border-color: var(--green); }
+
+/* VLAN VISUAL */
+.vlan-visual {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+  justify-content: center;
+}
+.vlan-bubble {
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 120px;
+  animation: bubblePop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+.vlan-bubble:hover { transform: scale(1.1) rotate(-2deg); }
+@keyframes bubblePop { from {opacity:0;transform:scale(0.5);} }
+.vlan-bubble.hr { background: rgba(59,130,246,0.2); border: 2px solid var(--blue); }
+.vlan-bubble.sales { background: rgba(34,197,94,0.2); border: 2px solid var(--green); }
+.vlan-bubble.market { background: rgba(249,115,22,0.2); border: 2px solid var(--orange); }
+.vlan-bubble.native { background: rgba(168,85,247,0.2); border: 2px solid var(--purple); }
+.vlan-id { font-family:'Fredoka One',cursive; font-size:1.8rem; display:block; }
+.vlan-name { font-weight:800; font-size:0.85rem; }
+.vlan-ports { font-size:0.75rem; color:var(--text2); margin-top:0.3rem; }
+
+/* PACKET ANIMATION */
+.packet-path {
+  position: relative;
+  height: 80px;
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+}
+.packet-node {
+  background: var(--card2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.packet-wire {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.packet-dot {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--cyan);
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: packetTravel 2s linear infinite;
+}
+@keyframes packetTravel { from{left:-12px;} to{left:100%;} }
+
+/* FLOATING IMAGE SUMMARY */
+.summary-images {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.summary-img-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+.summary-img-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), var(--glow-purple);
+}
+.summary-img-card img { width:100%; display:block; }
+.summary-img-label {
+  padding: 0.8rem 1rem;
+  font-family: var(--font-note);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: linear-gradient(transparent 55%, var(--highlight-pink) 55%);
+}
+
+/* ===== LAB SIMULATOR (CLI guidée) ===== */
+.lab-sim-wrap {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 900px) { .lab-sim-wrap { grid-template-columns: 1fr; } }
+
+.lab-sim-sidebar {
+  background: var(--card);
+  border: 2px dashed var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  position: sticky;
+  top: 5rem;
+}
+.lab-sim-sidebar h4 {
+  font-family: var(--font-hand);
+  font-size: 1.35rem;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+.lab-checklist { list-style: none; margin: 0; padding: 0; }
+.lab-checklist li {
+  font-family: var(--font-note);
+  font-size: 0.92rem;
+  padding: 0.45rem 0.5rem 0.45rem 1.8rem;
+  position: relative;
+  color: var(--text2);
+  border-bottom: 1px dotted var(--border);
+}
+.lab-checklist li::before {
+  content: '☐';
+  position: absolute;
+  left: 0;
+  font-size: 1rem;
+}
+.lab-checklist li.done { color: var(--green); text-decoration: line-through; opacity: 0.85; }
+.lab-checklist li.done::before { content: '☑'; color: var(--green); }
+.lab-checklist li.current {
+  background: var(--highlight);
+  color: var(--ink);
+  font-weight: 700;
+  border-radius: 4px;
+}
+.lab-checklist li.current::before { content: '✎'; }
+
+.cli-sim {
+  background: #0c0c0c;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 3px solid #2c2416;
+  box-shadow: 4px 6px 0 rgba(44,36,22,0.25);
+}
+.cli-sim-bar {
+  background: #2a2a2a;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-note);
+  font-size: 0.8rem;
+  color: #aaa;
+}
+.cli-sim-body {
+  padding: 1rem;
+  min-height: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  color: #b8f0b8;
+}
+.cli-line { margin-bottom: 0.15rem; word-break: break-all; }
+.cli-line.err { color: #ff8a8a; }
+.cli-line.ok { color: #86efac; }
+.cli-line.hint { color: #fde68a; font-style: italic; }
+.cli-line.sys { color: #93c5fd; }
+.cli-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0.6rem 1rem;
+  background: #111;
+  border-top: 1px solid #333;
+}
+.cli-prompt {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  color: #f9a8d4;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cli-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.82rem;
+  color: #fff;
+  padding: 0.35rem 0.5rem;
+  caret-color: #86efac;
+}
+.lab-sim-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+.lab-sim-actions .btn { font-family: var(--font-note); font-size: 0.9rem; }
+.lab-objective {
+  font-family: var(--font-note);
+  background: var(--highlight);
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--orange);
+  margin-bottom: 1rem;
+  border-radius: 0 6px 6px 0;
+}
+.lab-tuto {
+  font-size: 0.88rem;
+  color: var(--text2);
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255,255,255,0.6);
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+}
+.highlight-text {
+  background: linear-gradient(transparent 40%, var(--highlight) 40%);
+  font-weight: 700;
+}
+.small.muted, .section-desc { color: var(--text2) !important; }
+.content-panel h3, .content-panel h4 { color: var(--ink) !important; }
+.content-panel p, .content-panel li { color: var(--text); }
+.content-panel strong { color: var(--ink); }
+.vuln-card p { color: var(--text2) !important; }
+.hero-pill { cursor: pointer; }
+.hero-pill:hover { background: var(--highlight); border-color: var(--orange); }
+
+/* Topologie Lab Final */
+.lab-topology-panel {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  background: var(--paper);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-page);
+  overflow-x: auto;
+}
+.lab-topology-panel h4 {
+  font-family: var(--font-hand);
+  font-size: 1.4rem;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+.topo-diagram-final {
+  min-width: 720px;
+  margin: 0 auto;
+  font-family: var(--font-note);
+  font-size: 0.78rem;
+}
+.topo-row-final {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  position: relative;
+}
+.topo-box {
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  min-width: 100px;
+  background: #fff;
+  box-shadow: 2px 3px 0 rgba(44,36,22,0.15);
+}
+.topo-box.router { background: #dbeafe; border-color: #2563eb; }
+.topo-box.switch { background: #dcfce7; border-color: #16a34a; }
+.topo-box.pc { background: #fef9c3; border-color: #ca8a04; min-width: 72px; font-size: 0.7rem; }
+.topo-box.cloud { background: #f3e8ff; border-color: #9333ea; border-radius: 20px; }
+.topo-box strong { display: block; font-family: var(--font-hand); font-size: 1rem; }
+.topo-link-v {
+  width: 2px;
+  height: 28px;
+  background: var(--ink);
+  margin: 0 auto;
+  position: relative;
+}
+.topo-link-v::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--ink);
+}
+.topo-link-h {
+  flex: 1;
+  max-width: 60px;
+  height: 2px;
+  background: var(--ink);
+  position: relative;
+}
+.topo-link-label {
+  font-size: 0.65rem;
+  color: var(--text2);
+  text-align: center;
+  font-family: 'Space Mono', monospace;
+  margin: 2px 0;
+}
+.topo-vlans {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+.topo-vlan-tag {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.topo-vlan-tag.v10 { background: #bfdbfe; color: #1e40af; }
+.topo-vlan-tag.v20 { background: #bbf7d0; color: #166534; }
+.topo-vlan-tag.v30 { background: #fed7aa; color: #9a3412; }
+.topo-vlan-tag.v99 { background: #e9d5ff; color: #6b21a8; }
+.lab-tab {
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  background: var(--card);
+  color: var(--ink);
+  font-family: var(--font-note);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.lab-tab:hover, .lab-tab.active {
+  border-color: var(--blue);
+  background: rgba(91,143,217,0.12);
+}
+.lab-tab.lab-final-tab { border-color: var(--orange) !important; font-weight: 800; }
+.summary-img-media {
+  position: relative;
+  min-height: 220px;
+  background: linear-gradient(135deg, rgba(91,143,217,0.12), rgba(155,127,212,0.12));
+}
+.summary-img-media img {
+  width: 100%;
+  display: none;
+}
+.summary-img-media.has-image img { display: block; }
+.summary-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 220px;
+  padding: 1rem;
+  text-align: center;
+  font-family: var(--font-note);
+  color: var(--text2);
+}
+.summary-img-media.has-image .summary-img-placeholder { display: none; }
+.summary-img-emoji { font-size: 3rem; line-height: 1; }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+
+<!-- STARS -->
+
+<!-- HERO -->
+<section class="hero" id="heroSection">
+  <div class="hero-badge">📓 NetAcademy — Cahier IT</div>
+  <h1>NetAcademy</h1>
+  <p class="hero-sub">Administration réseau & sécurité — cours techniques, labs guidés en ligne de commande, comme sur un vrai routeur ou switch Cisco ✏️</p>
+  <div class="hero-cards">
+    <div class="hero-pill" onclick="showSection('vlan', this)">🏷️ VLAN</div>
+    <div class="hero-pill" onclick="showSection('stp', this)">🌉 STP</div>
+    <div class="hero-pill" onclick="showSection('etherchannel', this)">🔗 EtherChannel</div>
+    <div class="hero-pill" onclick="showSection('dhcp', this)">📡 DHCP</div>
+    <div class="hero-pill" onclick="showSection('dns', this)">🔍 DNS</div>
+    <div class="hero-pill" onclick="showSection('securite', this)">🛡️ Sécurité</div>
+    <div class="hero-pill" onclick="showSection('lab', this)">🖥️ Labs CLI</div>
+    <button type="button" class="nav-btn" data-section="resumes" onclick="showSection('resumes', this)">📸 Résumés</button>
+  </div>
+  <button class="btn btn-primary" onclick="document.querySelector('.navbar').scrollIntoView({behavior:'smooth'})">Commencer à apprendre 🚀</button>
+  <p class="hero-signature" aria-label="Auteur du cahier"><span>par</span> Tudert Sahraoui</p>
+</section>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <span class="nav-logo">📓 NetAcademy</span>
+  <button type="button" class="nav-btn active" data-section="home" onclick="showSection('home', this)">🏠 Accueil</button>
+  <button type="button" class="nav-btn" data-section="vlan" onclick="showSection('vlan', this)">🏷️ VLAN</button>
+  <button type="button" class="nav-btn" data-section="stp" onclick="showSection('stp', this)">🌉 STP</button>
+  <button type="button" class="nav-btn" data-section="etherchannel" onclick="showSection('etherchannel', this)">🔗 EtherChannel</button>
+  <button type="button" class="nav-btn" data-section="dhcp" onclick="showSection('dhcp', this)">📡 DHCP</button>
+  <button type="button" class="nav-btn" data-section="dhcpv6" onclick="showSection('dhcpv6', this)">🌍 DHCPv6</button>
+  <button type="button" class="nav-btn" data-section="dns" onclick="showSection('dns', this)">🔍 DNS</button>
+  <button type="button" class="nav-btn" data-section="securite" onclick="showSection('securite', this)">🛡️ Sécurité</button>
+  <button type="button" class="nav-btn" data-section="lab" onclick="showSection('lab', this)">🖥️ Labs CLI</button>
+  <button type="button" class="nav-btn" data-section="resumes" onclick="showSection('resumes', this)">📸 Résumés</button>
+</nav>
+
+<main>
+
+<!-- ===== HOME ===== -->
+<div class="section active" id="section-home">
+  <div class="section-header">
+    <div class="section-title">Bienvenue dans NetAcademy ! 🎉</div>
+    <p class="section-desc">Ton parcours complet d'administration réseau — de la théorie aux scénarios réels</p>
+  </div>
+
+  <div class="content-panel" style="margin-bottom:1.75rem;border-color:rgba(91,143,217,0.35);">
+    <h3 style="font-family:var(--font-hand);font-size:1.5rem;color:var(--ink);margin-bottom:1rem;">🎓 Compétences admin réseau, système & cybersécurité</h3>
+    <p style="color:var(--text2);line-height:1.75;margin-bottom:1rem;">Objectif : maîtriser la <strong>couche 2–3</strong>, les services IP et les contrôles de sécurité demandés en entreprise — avec la logique de dépannage d'un professionnel.</p>
+    <table class="fancy-table">
+      <thead><tr><th>Domaine</th><th>Contenu du cours</th><th>En production</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Réseau</strong></td><td>VLAN, 802.1Q, inter-VLAN, STP/RSTP, LACP</td><td>Segmentation, redondance sans boucle</td></tr>
+        <tr><td><strong>Services</strong></td><td>DHCP, relay, DHCPv6, DNS</td><td>Onboarding, résolution de noms</td></tr>
+        <tr><td><strong>Cyber</strong></td><td>Port Security, Snooping, DAI, durcissement IOS</td><td>MitM, rogue DHCP, accès non autorisés</td></tr>
+        <tr><td><strong>Opérations</strong></td><td>Modèle OSI, commandes <code>show</code>, scénarios</td><td>MTTR court, logs corrélés (NTP)</td></tr>
+      </tbody>
+    </table>
+    <div class="highlight" style="margin-top:1rem;margin-bottom:0;">
+      <strong>Réflexe pro :</strong> inventaire VLAN (ID, nom, sous-réseau, gateway), sauvegarde après changement (<code>copy running-config startup-config</code>), horloge synchronisée (NTP) avant analyse des logs.
+    </div>
+    </div>
+
+  <div class="grid grid-3">
+    <div class="module-card pink bounce-in" onclick="showSection('vlan')" style="animation-delay:0.1s">
+      <span class="card-icon">🏷️</span>
+      <div class="card-title">VLAN</div>
+      <div class="card-desc">Virtual LAN — segmentation logique du réseau. Configuration, trunk, inter-VLAN routing.</div>
+      <div class="card-tags"><span class="tag tag-pink">Couche 2</span><span class="tag tag-blue">Switch</span><span class="tag tag-purple">Trunk</span></div>
+    </div>
+    <div class="module-card blue bounce-in" onclick="showSection('stp')" style="animation-delay:0.15s">
+      <span class="card-icon">🌉</span>
+      <div class="card-title">STP</div>
+      <div class="card-desc">Spanning Tree Protocol — éviter les boucles réseau. Election Root Bridge, états des ports.</div>
+      <div class="card-tags"><span class="tag tag-blue">Couche 2</span><span class="tag tag-orange">BPDU</span><span class="tag tag-green">Redondance</span></div>
+    </div>
+    <div class="module-card orange bounce-in" onclick="showSection('etherchannel')" style="animation-delay:0.2s">
+      <span class="card-icon">🔗</span>
+      <div class="card-title">EtherChannel</div>
+      <div class="card-desc">Agrégation de liens physiques — LACP vs PAgP, Layer 2 vs Layer 3.</div>
+      <div class="card-tags"><span class="tag tag-orange">LACP</span><span class="tag tag-purple">PAgP</span><span class="tag tag-blue">Port-Channel</span></div>
+    </div>
+    <div class="module-card green bounce-in" onclick="showSection('dhcp')" style="animation-delay:0.25s">
+      <span class="card-icon">📡</span>
+      <div class="card-title">DHCP</div>
+      <div class="card-desc">Dynamic Host Configuration Protocol — processus DORA, configuration serveur Cisco.</div>
+      <div class="card-tags"><span class="tag tag-green">UDP</span><span class="tag tag-blue">Port 67/68</span><span class="tag tag-orange">DORA</span></div>
+    </div>
+    <div class="module-card purple bounce-in" onclick="showSection('dhcpv6')" style="animation-delay:0.3s">
+      <span class="card-icon">🌍</span>
+      <div class="card-title">DHCPv6</div>
+      <div class="card-desc">DHCP pour IPv6 — Stateful vs Stateless, SLAAC, processus SARR.</div>
+      <div class="card-tags"><span class="tag tag-purple">IPv6</span><span class="tag tag-green">SARR</span><span class="tag tag-blue">SLAAC</span></div>
+    </div>
+    <div class="module-card pink bounce-in" onclick="showSection('dns')" style="animation-delay:0.35s">
+      <span class="card-icon">🔍</span>
+      <div class="card-title">DNS</div>
+      <div class="card-desc">Domain Name System — résolution de noms, forward/reverse lookup, port 53.</div>
+      <div class="card-tags"><span class="tag tag-pink">Port 53</span><span class="tag tag-blue">UDP/TCP</span><span class="tag tag-orange">Zones</span></div>
+    </div>
+    <div class="module-card red bounce-in" onclick="showSection('securite')" style="animation-delay:0.4s">
+      <span class="card-icon">🛡️</span>
+      <div class="card-title">Sécurité Réseau</div>
+      <div class="card-desc">Vulnérabilités, bonnes pratiques, DHCP Snooping, Port Security, attaques VLAN.</div>
+      <div class="card-tags"><span class="tag tag-red">Vulnérabilités</span><span class="tag tag-orange">ACL</span><span class="tag tag-green">Mitigation</span></div>
+    </div>
+    <div class="module-card blue bounce-in" onclick="showSection('lab')" style="animation-delay:0.45s">
+      <span class="card-icon">🧪</span>
+      <div class="card-title">Labs & Simulations</div>
+      <div class="card-desc">Terminal CLI guidé : commandes Cisco, correction intelligente, checklist par module.</div>
+      <div class="card-tags"><span class="tag tag-blue">Pratique</span><span class="tag tag-green">Config</span><span class="tag tag-purple">Troubleshoot</span></div>
+    </div>
+  </div>
+
+  <div class="sticky-note" style="max-width:500px;margin:2rem auto;">
+    💡 <strong>Parcours recommandé :</strong> VLAN → STP/RSTP → EtherChannel → DHCP/DNS → Sécurité L2 → Labs CLI → Lab Final. Chaque module contient des encadrés <strong>niveau pro</strong> pour l'entretien et le terrain 🌟
+  </div>
+</div>
+
+<!-- ===== VLAN ===== -->
+<div class="section" id="section-vlan">
+  <div class="section-header">
+    <div class="section-title">🏷️ VLAN — Virtual LAN</div>
+    <p class="section-desc">Segmentation logique du réseau pour plus de performance, sécurité et gestion</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('vlan','theorie', this)">📚 Théorie</button>
+    <button class="subtab" onclick="showSubtab('vlan','config', this)">⚙️ Configuration</button>
+    <button class="subtab" onclick="showSubtab('vlan','trunk', this)">🔌 Trunk & 802.1Q</button>
+    <button class="subtab" onclick="showSubtab('vlan','intervlan', this)">🔀 Inter-VLAN</button>
+    <button class="subtab" onclick="showSubtab('vlan','securite', this)">🛡️ Sécurité</button>
+    <button class="subtab" onclick="showSubtab('vlan','troubleshoot', this)">🔧 Dépannage</button>
+  </div>
+
+  <!-- THEORIE -->
+  <div class="subcontent active" id="vlan-theorie">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.5rem;margin-bottom:1rem;color:var(--pink)">🤔 C'est quoi un VLAN ?</h3>
+      <p style="color:var(--text2);line-height:1.8;margin-bottom:1rem;">Un <strong style="color:var(--ink)">VLAN (Virtual Local Area Network)</strong> est un <span class="tooltip-wrap"><span class="tooltip-trigger">réseau logique</span><span class="tooltip-content">Un réseau qui n'est pas physiquement séparé, mais isolé par configuration logicielle du switch.</span></span> créé à partir d'un réseau physique. Il permet de segmenter les équipements indépendamment de leur emplacement physique.</p>
+
+      <div class="vlan-visual">
+        <div class="vlan-bubble hr" style="animation-delay:0.1s">
+          <span class="vlan-id" style="color:var(--blue)">10</span>
+          <div class="vlan-name" style="color:var(--blue)">HR</div>
+          <div class="vlan-ports">Fa0/1 — Fa0/2</div>
+        </div>
+        <div class="vlan-bubble sales" style="animation-delay:0.2s">
+          <span class="vlan-id" style="color:var(--green)">20</span>
+          <div class="vlan-name" style="color:var(--green)">SALES</div>
+          <div class="vlan-ports">Fa0/3 — Fa0/4</div>
+        </div>
+        <div class="vlan-bubble market" style="animation-delay:0.3s">
+          <span class="vlan-id" style="color:var(--orange)">30</span>
+          <div class="vlan-name" style="color:var(--orange)">MARKET</div>
+          <div class="vlan-ports">Fa0/5 — Fa0/6</div>
+        </div>
+        <div class="vlan-bubble native" style="animation-delay:0.4s">
+          <span class="vlan-id" style="color:var(--purple)">99</span>
+          <div class="vlan-name" style="color:var(--purple)">NATIVE</div>
+          <div class="vlan-ports">Trunk Only</div>
+        </div>
+      </div>
+
+      <div class="grid grid-3" style="margin-top:1.5rem;">
+        <div class="content-panel" style="border-color:rgba(59,130,246,0.3)">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">📡</div>
+          <h4 style="font-weight:800;color:var(--blue);margin-bottom:0.5rem;">Réduction Broadcast</h4>
+          <p style="font-size:0.85rem;color:var(--text2);">Chaque VLAN = 1 domaine de broadcast. Plus de tempêtes de diffusion dans tout le réseau !</p>
+        </div>
+        <div class="content-panel" style="border-color:rgba(34,197,94,0.3)">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">🔒</div>
+          <h4 style="font-weight:800;color:var(--green);margin-bottom:0.5rem;">Sécurité</h4>
+          <p style="font-size:0.85rem;color:var(--text2);">HR ne peut pas communiquer directement avec SALES — isolation par défaut entre VLANs !</p>
+        </div>
+        <div class="content-panel" style="border-color:rgba(249,115,22,0.3)">
+          <div style="font-size:2rem;margin-bottom:0.5rem;">⚡</div>
+          <h4 style="font-weight:800;color:var(--orange);margin-bottom:0.5rem;">Performance</h4>
+          <p style="font-size:0.85rem;color:var(--text2);">Trafic limité au VLAN concerné → moins de congestion → meilleure bande passante !</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--cyan);margin-bottom:1rem;">📋 Types de ports VLAN</h3>
+      <table class="fancy-table">
+        <thead>
+          <tr><th>Type de Port</th><th>Rôle</th><th>Trafic</th><th>Utilisation</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>Access Port</strong></td><td>Un seul VLAN</td><td>Non tagué</td><td>PC, imprimante, téléphone</td></tr>
+          <tr><td><strong>Trunk Port</strong></td><td>Plusieurs VLANs</td><td>Tagué 802.1Q</td><td>Switch-Switch, Switch-Routeur</td></tr>
+          <tr><td><strong>Voice Port</strong></td><td>Data + Voix</td><td>2 VLANs</td><td>IP Phone</td></tr>
+          <tr><td><strong>Native VLAN</strong></td><td>Trafic non tagué sur trunk</td><td>Sans tag</td><td>Gestion, VLAN 99</td></tr>
+        </tbody>
+      </table>
+
+      <div class="highlight">
+        <strong>💡 Réflexe Admin :</strong> Le Native VLAN doit être le <strong>même</strong> des deux côtés d'un trunk ! Sinon → mismatch → problème de sécurité (VLAN Hopping possible).
+      </div>
+    </div>
+
+    <div class="sticky-note pink" style="max-width:400px;">
+      🎯 <strong>Mémo VLAN :</strong><br>
+      Access = 1 VLAN = 1 machine<br>
+      Trunk = plusieurs VLANs = switch à switch<br>
+      Native = non tagué sur trunk (VLAN 99 conseillé)
+    </div>
+
+    <div class="content-panel" style="margin-top:1.5rem;border-color:rgba(91,143,217,0.3);">
+      <h4 style="font-weight:800;color:var(--ink);margin-bottom:0.75rem;">📐 Plages VLAN & modèle 3 couches</h4>
+      <table class="fancy-table">
+        <thead><tr><th>Plage</th><th>Usage pro</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1</strong></td><td>VLAN par défaut — ne pas y placer les postes utilisateurs</td></tr>
+          <tr><td><strong>2–1001</strong></td><td>VLANs métier (HR, invités, serveurs…) — documentés dans un registre</td></tr>
+          <tr><td><strong>1006–4094</strong></td><td>VLANs étendus : DMZ, stockage, management, labo</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;line-height:1.65;"><strong>Access</strong> (postes) → <strong>Distribution</strong> (agrégation, politiques) → <strong>Core</strong> (haut débit). Le routage inter-VLAN se fait en distribution/core sur équipement L3.</p>
+    </div>
+  </div>
+
+  <!-- CONFIG -->
+  <div class="subcontent" id="vlan-config">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--pink);margin-bottom:1rem;">⚙️ Configuration complète SW1</h3>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">SW1 — Configuration VLAN</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-prompt">SW1></span><span class="t-cmd"> enable</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> configure terminal</span>
+
+<span class="t-warn">! ===== ÉTAPE 1 : Créer les VLANs =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> vlan 10</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> name HR</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> vlan 20</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> name SALES</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> vlan 30</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> name MARKET</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> vlan 99</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> name NATIVE</span>
+<span class="t-prompt">SW1(config-vlan)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== ÉTAPE 2 : Assigner les ports Access =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface range fa0/1 - 2</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport mode access</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport access vlan 10</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface range fa0/3 - 4</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport mode access</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport access vlan 20</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface range fa0/5 - 6</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport mode access</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport access vlan 30</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== ÉTAPE 3 : Configurer le port Trunk =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface g0/1</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk encapsulation dot1q</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport mode trunk</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk native vlan 99</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk allowed vlan 10,20,30,99</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> end</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> write memory</span>
+<span class="t-out">[OK]</span>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div><strong>Sur les switches L3 (comme Catalyst 3560)</strong> : tu dois ajouter <code>switchport trunk encapsulation dot1q</code> AVANT <code>switchport mode trunk</code>. Sur les switches L2, ce n'est pas nécessaire.</div>
+      </div>
+
+      <div class="grid grid-2" style="margin-top:1.5rem;">
+        <div class="content-panel" style="border-color:rgba(34,197,94,0.3)">
+          <h4 style="color:var(--green);font-weight:800;margin-bottom:1rem;">✅ Commandes de Vérification</h4>
+          <div class="code-block" data-label="Vérification">
+<pre><span class="cmd">show vlan brief</span>           <span class="comment"># Tous les VLANs</span>
+<span class="cmd">show vlan id 10</span>           <span class="comment"># VLAN spécifique</span>
+<span class="cmd">show interfaces trunk</span>     <span class="comment"># Ports trunk</span>
+<span class="cmd">show interfaces fa0/1 switchport</span> <span class="comment"># Détail port</span>
+<span class="cmd">show running-config</span>       <span class="comment"># Config complète</span></pre>
+          </div>
+        </div>
+        <div class="content-panel" style="border-color:rgba(239,68,68,0.3)">
+          <h4 style="color:var(--red);font-weight:800;margin-bottom:1rem;">❌ Erreurs Fréquentes</h4>
+          <div class="steps">
+            <div class="step" style="padding:0.7rem;animation-delay:0.1s;">
+              <div class="step-num pink" style="width:30px;height:30px;font-size:0.8rem;">1</div>
+              <div class="step-content"><p>Oublier de créer le VLAN avant d'assigner un port → port reste dans VLAN 1</p></div>
+            </div>
+            <div class="step" style="padding:0.7rem;animation-delay:0.2s;">
+              <div class="step-num pink" style="width:30px;height:30px;font-size:0.8rem;">2</div>
+              <div class="step-content"><p>Native VLAN différent des 2 côtés du trunk → CDP warning + sécurité</p></div>
+            </div>
+            <div class="step" style="padding:0.7rem;animation-delay:0.3s;">
+              <div class="step-num pink" style="width:30px;height:30px;font-size:0.8rem;">3</div>
+              <div class="step-content"><p>Ne pas autoriser les VLANs sur le trunk → trafic bloqué</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRUNK -->
+  <div class="subcontent" id="vlan-trunk">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1rem;">🔌 Le Trunk 802.1Q — Comment ça marche ?</h3>
+
+      <div class="highlight">
+        Un <strong>trunk</strong> est un lien qui transporte plusieurs VLANs en même temps. Il utilise le standard <strong>IEEE 802.1Q</strong> qui ajoute un <strong>tag de 4 octets</strong> dans l'en-tête Ethernet pour identifier le VLAN.
+      </div>
+
+      <div class="packet-path">
+        <div class="packet-node" style="border-color:var(--blue);color:var(--blue)">PC1<br><small>VLAN 10</small></div>
+        <div class="packet-wire" style="background:var(--blue)"><div class="packet-dot" style="background:var(--blue);box-shadow:0 0 8px var(--blue)"></div></div>
+        <div class="packet-node" style="border-color:var(--pink);color:var(--pink)">SW1<br><small>Tag 802.1Q</small></div>
+        <div class="packet-wire"><div class="packet-dot"></div></div>
+        <div class="packet-node" style="border-color:var(--purple);color:var(--purple)">TRUNK<br><small>G0/1</small></div>
+        <div class="packet-wire"><div class="packet-dot" style="animation-delay:0.5s"></div></div>
+        <div class="packet-node" style="border-color:var(--orange);color:var(--orange)">R1<br><small>Sub-IF</small></div>
+      </div>
+
+      <div class="notebook">
+        <h4>📖 Structure d'une trame 802.1Q</h4>
+        <p>Trame Ethernet normale :</p>
+        <p><code>[DA MAC | SA MAC | EtherType | Data | FCS]</code></p>
+        <br>
+        <p>Trame 802.1Q (avec tag inséré) :</p>
+        <p><code>[DA MAC | SA MAC | <strong style="color:#6d28d9">0x8100 | PCP | DEI | VLAN ID (12 bits)</strong> | EtherType | Data | FCS]</code></p>
+        <br>
+        <p>💡 Le VLAN ID sur 12 bits → max 4094 VLANs possibles (1-4094, 0 et 4095 réservés)</p>
+      </div>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">ℹ️</span>
+        <div><strong>Native VLAN</strong> = le seul VLAN dont les trames ne sont PAS taguées sur le trunk. Par défaut c'est VLAN 1 — on le change en VLAN 99 pour des raisons de sécurité !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTER-VLAN -->
+  <div class="subcontent" id="vlan-intervlan">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">🔀 Inter-VLAN Routing — Router-on-a-Stick</h3>
+
+      <p style="color:var(--text2);margin-bottom:1.5rem;">Par défaut, les VLANs s'ignorent ! Pour qu'ils communiquent, il faut un routeur. La méthode <strong style="color:var(--ink)">Router-on-a-Stick</strong> utilise un seul port physique avec des <strong style="color:var(--ink)">sous-interfaces</strong> (sub-interfaces).</p>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div>
+          <div class="terminal-dot yellow"></div>
+          <div class="terminal-dot green"></div>
+          <div class="terminal-title">R1 — Router-on-a-Stick Configuration</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== Activer l'interface physique =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0</span>
+<span class="t-prompt">R1(config-if)#</span><span class="t-cmd"> no shutdown</span>
+<span class="t-prompt">R1(config-if)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Sous-interface VLAN 10 (HR) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> encapsulation dot1q 10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip address 192.168.10.1 255.255.255.0</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Sous-interface VLAN 20 (SALES) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.20</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> encapsulation dot1q 20</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip address 192.168.20.1 255.255.255.0</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Sous-interface VLAN 30 (MARKET) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.30</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> encapsulation dot1q 30</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip address 192.168.30.1 255.255.255.0</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== VLAN 99 NATIVE (sans "native" = tagué) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.99</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> encapsulation dot1q 99 native</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip address 192.168.90.1 255.255.255.0</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> end</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> write memory</span>
+        </div>
+      </div>
+
+      <div class="sticky-note blue" style="max-width:450px;">
+        🔑 <strong>Logique :</strong> Chaque VLAN = 1 sous-interface sur le routeur. Le numéro après le point (.10, .20...) est conventionnel — il correspond au VLAN ID pour la lisibilité. Ce qui compte c'est <code>encapsulation dot1q [ID]</code> !
+      </div>
+
+      <div class="content-panel" style="margin-top:1.5rem;border-color:rgba(34,197,94,0.35);">
+        <h4 style="font-weight:800;color:var(--green);margin-bottom:0.75rem;">⚡ Routage inter-VLAN sur switch L3 (SVI)</h4>
+        <p style="color:var(--text2);font-size:0.9rem;line-height:1.7;margin-bottom:0.75rem;">En entreprise, le switch multilayer remplace souvent le routeur externe : chaque VLAN a une <strong>SVI</strong> (interface <code>vlan X</code>) qui sert de passerelle.</p>
+        <div class="code-block" data-label="SVI">
+<pre><span class="cmd">ip routing</span>
+<span class="cmd">interface vlan 10</span>
+<span class="cmd"> ip address 192.168.10.1 255.255.255.0</span>
+<span class="cmd"> no shutdown</span>
+<span class="comment"># show ip route connected | show ip interface brief</span></pre>
+        </div>
+        <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem;">Router-on-a-Stick = labo / PME. SVI = campus et datacenter (meilleure latence, moins de sauts).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- VLAN SECURITE -->
+  <div class="subcontent" id="vlan-securite">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--red);margin-bottom:1.5rem;">🛡️ Sécurité VLAN</h3>
+
+      <div class="vuln-card">
+        <div class="vuln-header">
+          <span class="vuln-badge">CRITIQUE</span>
+          <span class="vuln-title">🎭 VLAN Hopping — Switch Spoofing</span>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text2);">Un attaquant configure son PC pour se faire passer pour un switch et négocie un trunk DTP → accès à TOUS les VLANs !</p>
+        <div class="vuln-fix">
+          <span class="fix-badge">FIX</span> Désactiver DTP sur tous les ports access : <code>switchport nonegotiate</code> et forcer le mode access.
+        </div>
+        <div class="code-block" data-label="Mitigation" style="margin-top:0.8rem;">
+<pre><span class="comment"># Sur TOUS les ports access :</span>
+<span class="cmd">SW(config-if)# switchport mode access</span>
+<span class="cmd">SW(config-if)# switchport nonegotiate</span>
+<span class="cmd">SW(config-if)# switchport access vlan 10</span></pre>
+        </div>
+      </div>
+
+      <div class="vuln-card" style="margin-top:1rem;">
+        <div class="vuln-header">
+          <span class="vuln-badge">ÉLEVÉ</span>
+          <span class="vuln-title">🏷️ Double Tagging Attack</span>
+        </div>
+        <p style="font-size:0.88rem;color:var(--text2);">L'attaquant envoie une trame avec 2 tags 802.1Q — le switch retire le premier tag (native VLAN) et forward le 2ème vers un autre VLAN !</p>
+        <div class="vuln-fix">
+          <span class="fix-badge">FIX</span> Changer le Native VLAN vers un VLAN inutilisé (ex: 99) et ne JAMAIS mettre des ports access sur le Native VLAN.
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✅</span>
+        <div><strong>Bonnes pratiques VLAN sécurité :</strong><br>
+        1. Changer le Native VLAN (pas VLAN 1)<br>
+        2. Désactiver les ports inutilisés → <code>shutdown</code> + VLAN black-hole<br>
+        3. Activer <strong>Port Security</strong> pour limiter les MAC addresses<br>
+        4. Activer <strong>DHCP Snooping</strong> pour prévenir les faux serveurs DHCP<br>
+        5. <strong>Storm-control</strong> sur les trunks : limiter broadcast/multicast/unicast inconnu<br>
+        6. VLAN de <strong>management</strong> dédié (SSH uniquement depuis IP autorisées)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TROUBLESHOOT -->
+  <div class="subcontent" id="vlan-troubleshoot">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--yellow);margin-bottom:1.5rem;">🔧 Dépannage VLAN — Réflexes Admin</h3>
+
+      <div class="scenario-box">
+        <div class="scenario-title">Scénario : PC1 (VLAN 10) ne peut pas pinguer PC3 (VLAN 20)</div>
+        <div class="steps">
+          <div class="step" style="animation-delay:0.1s">
+            <div class="step-num blue">1</div>
+            <div class="step-content"><h4>Vérifier les VLANs existants</h4><p><code>show vlan brief</code> → VLAN 10 et 20 bien créés et actifs ?</p></div>
+          </div>
+          <div class="step" style="animation-delay:0.2s">
+            <div class="step-num green">2</div>
+            <div class="step-content"><h4>Vérifier l'assignation des ports</h4><p><code>show interfaces fa0/1 switchport</code> → Port bien en mode access VLAN 10 ?</p></div>
+          </div>
+          <div class="step" style="animation-delay:0.3s">
+            <div class="step-num orange">3</div>
+            <div class="step-content"><h4>Vérifier le trunk</h4><p><code>show interfaces trunk</code> → VLAN 10 et 20 bien autorisés sur le trunk ?</p></div>
+          </div>
+          <div class="step" style="animation-delay:0.4s">
+            <div class="step-num pink">4</div>
+            <div class="step-content"><h4>Vérifier le routeur</h4><p><code>show ip route</code> sur R1 → Routes vers 192.168.10.0/24 et 192.168.20.0/24 présentes ?</p></div>
+          </div>
+          <div class="step" style="animation-delay:0.5s">
+            <div class="step-num blue">5</div>
+            <div class="step-content"><h4>Vérifier les IP des PCs</h4><p>PC1 a bien 192.168.10.x/24 avec gateway 192.168.10.1 ? PC3 a 192.168.20.x/24 ?</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticky-note orange" style="max-width:450px;">
+        🚦 <strong>Ordre de dépannage :</strong><br>
+        Couche 1 → Couche 2 → Couche 3<br>
+        Câble OK → VLAN/Trunk OK → IP/Route OK<br>
+        Toujours commencer par le bas du modèle OSI !
+      </div>
+      <div class="content-panel" style="margin-top:1.5rem;">
+        <h4 style="font-weight:800;color:var(--ink);margin-bottom:0.75rem;">🛠️ Commandes terrain</h4>
+        <div class="code-block" data-label="Diagnostic">
+<pre><span class="cmd">show interfaces status</span>
+<span class="cmd">show mac address-table vlan 10</span>
+<span class="cmd">show spanning-tree interface g0/1</span>
+<span class="cmd">show ip interface brief</span>
+<span class="comment"># Depuis switch L3 : ping avec source VLAN</span>
+<span class="cmd">ping 192.168.20.1 source vlan 10</span></pre>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===== STP ===== -->
+
+<div class="section" id="section-stp">
+  <div class="section-header">
+    <div class="section-title">🌉 STP — Spanning Tree Protocol</div>
+    <p class="section-desc">Éviter les boucles réseau tout en gardant la redondance</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('stp','theorie', this)">📚 Théorie & Processus</button>
+    <button class="subtab" onclick="showSubtab('stp','election', this)">👑 Élection Root Bridge</button>
+    <button class="subtab" onclick="showSubtab('stp','config', this)">⚙️ Configuration</button>
+    <button class="subtab" onclick="showSubtab('stp','rstp', this)">⚡ RSTP & PVST+</button>
+  </div>
+
+  <div class="subcontent active" id="stp-theorie">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--blue);margin-bottom:1rem;">🤔 Pourquoi STP existe ?</h3>
+      <p style="color:var(--text2);line-height:1.8;margin-bottom:1.5rem;">Sans STP, si tu as des liens redondants entre switches → <strong style="color:var(--red)">BOUCLE INFINIE !</strong> Les trames tournent en rond → <strong style="color:var(--red)">broadcast storm</strong> → réseau down. STP résout ça en désactivant logiquement certains ports.</p>
+
+      <div class="dora-steps">
+        <div class="dora-step" style="border-color:var(--pink)">
+          <span class="dora-letter" style="color:var(--pink)">1</span>
+          <div class="dora-name">Élection</div>
+          <div class="dora-desc">Élection du Root Bridge (BID le plus bas)</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--blue)">
+          <span class="dora-letter" style="color:var(--blue)">2</span>
+          <div class="dora-name">Assignation</div>
+          <div class="dora-desc">Root Port, Designated Port, Blocked Port</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--orange)">
+          <span class="dora-letter" style="color:var(--orange)">3</span>
+          <div class="dora-name">Détection</div>
+          <div class="dora-desc">BPDUs échangés, détection de boucle</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--green)">
+          <span class="dora-letter" style="color:var(--green)">4</span>
+          <div class="dora-name">Blocage</div>
+          <div class="dora-desc">Port bloqué pour rompre la boucle</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--cyan)">
+          <span class="dora-letter" style="color:var(--cyan)">5</span>
+          <div class="dora-name">Stabilité</div>
+          <div class="dora-desc">Réseau stable, sans boucle, avec redondance</div>
+        </div>
+      </div>
+
+      <table class="fancy-table" style="margin-top:1.5rem;">
+        <thead><tr><th>État du Port</th><th>Reçoit BPDU</th><th>Envoie BPDU</th><th>Apprend MAC</th><th>Forward Data</th><th>Durée (STP)</th></tr></thead>
+        <tbody>
+          <tr><td>🔴 <strong>Blocking</strong></td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>20 sec max</td></tr>
+          <tr><td>🟡 <strong>Listening</strong></td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>15 sec</td></tr>
+          <tr><td>🟠 <strong>Learning</strong></td><td>✅</td><td>✅</td><td>✅</td><td>❌</td><td>15 sec</td></tr>
+          <tr><td>🟢 <strong>Forwarding</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>Normal</td></tr>
+          <tr><td>⚫ <strong>Disabled</strong></td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>Admin shutdown</td></tr>
+        </tbody>
+      </table>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⏱️</span>
+        <div><strong>Convergence STP classique ≈ 50 secondes !</strong> (20 blocking + 15 listening + 15 learning). C'est pour ça qu'on préfère RSTP aujourd'hui qui converge en &lt; 1 seconde !</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="stp-election">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--yellow);margin-bottom:1rem;">👑 Élection du Root Bridge</h3>
+
+      <div class="highlight">
+        Le <strong>Root Bridge</strong> est le switch central de la topologie STP. Tous les chemins actifs passent par lui. Le Root Bridge est élu via le <strong>BID (Bridge ID)</strong> le plus bas.
+      </div>
+
+      <div class="notebook">
+        <h4>🔢 Structure du BID (8 octets)</h4>
+        <p><strong>BID = Priority (2 octets) + MAC Address (6 octets)</strong></p>
+        <br>
+        <p>Priority par défaut : <strong>32768</strong></p>
+        <p>Priority = valeur configurée + VLAN ID (PVST+)</p>
+        <p>Ex: priority 32768 + VLAN 10 = BID priority <strong>32778</strong></p>
+        <br>
+        <p>⚡ À priorité égale → le plus petit <strong>MAC address</strong> gagne !</p>
+      </div>
+
+      <div class="steps">
+        <div class="step" style="animation-delay:0.1s">
+          <div class="step-num pink">1</div>
+          <div class="step-content"><h4>Tous les switches se proclament Root Bridge</h4><p>Au démarrage, chaque switch envoie des BPDUs en se déclarant Root. BID = sa propre priorité + MAC.</p></div>
+        </div>
+        <div class="step" style="animation-delay:0.2s">
+          <div class="step-num blue">2</div>
+          <div class="step-content"><h4>Comparaison des BIDs</h4><p>À réception d'un BPDU avec un meilleur BID (plus bas), le switch adopte l'autre comme Root Bridge.</p></div>
+        </div>
+        <div class="step" style="animation-delay:0.3s">
+          <div class="step-num green">3</div>
+          <div class="step-content"><h4>Seul le Root Bridge envoie des BPDUs</h4><p>Les autres switches ne font que relayer les BPDUs du Root Bridge vers les autres.</p></div>
+        </div>
+      </div>
+
+      <div class="alert alert-tip">
+        <span class="alert-icon">💡</span>
+        <div><strong>Réflexe Admin :</strong> Tu veux contrôler qui est Root Bridge ? Configure la priorité manuellement ! Le switch core/distribution devrait TOUJOURS être Root Bridge.<br><code>spanning-tree vlan 10 priority 4096</code> (multiple de 4096 !)</div>
+      </div>
+      <table class="fancy-table" style="margin-top:1.5rem;">
+        <thead><tr><th>Vitesse lien</th><th>Coût STP</th></tr></thead>
+        <tbody>
+          <tr><td>10 Gbps</td><td>2</td></tr>
+          <tr><td>1 Gbps</td><td>4</td></tr>
+          <tr><td>100 Mbps</td><td>19</td></tr>
+          <tr><td>10 Mbps</td><td>100</td></tr>
+        </tbody>
+      </table>
+      <p style="color:var(--text2);font-size:0.88rem;margin-top:0.75rem;line-height:1.6;">Élection du <strong>Root Port</strong> : plus petit coût de chemin vers le Root. Égalité → plus petit BID du voisin, puis plus petit port ID.</p>
+
+    </div>
+  </div>
+  <div class="subcontent" id="stp-config">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">⚙️ Configuration STP</h3>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">SW — Configuration STP</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== Définir le Root Bridge Primary =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> spanning-tree vlan 10 root primary</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> spanning-tree vlan 20 root primary</span>
+<span class="t-out"># Cisco configure auto la priorité à 24576 ou moins</span>
+
+<span class="t-warn">! ===== Ou manuellement =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> spanning-tree vlan 10 priority 4096</span>
+
+<span class="t-warn">! ===== Root Bridge Secondaire (backup) =====</span>
+<span class="t-prompt">SW2(config)#</span><span class="t-cmd"> spanning-tree vlan 10 root secondary</span>
+<span class="t-out"># Priority configurée à 28672</span>
+
+<span class="t-warn">! ===== PortFast — ports vers les PCs =====</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> spanning-tree portfast</span>
+<span class="t-out"># Port passe directement en Forwarding (skip Listening/Learning)</span>
+
+<span class="t-warn">! ===== BPDU Guard — sécurité PortFast =====</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> spanning-tree bpduguard enable</span>
+<span class="t-out"># Si BPDU reçu sur port PortFast → err-disabled automatique !</span>
+
+<span class="t-warn">! ===== Vérification =====</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show spanning-tree vlan 10</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show spanning-tree summary</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show spanning-tree detail</span>
+        </div>
+      </div>
+
+      <div class="vuln-card">
+        <div class="vuln-header"><span class="vuln-badge">SÉCURITÉ</span><span class="vuln-title">⚠️ BPDU Spoofing / Root Bridge Hijacking</span></div>
+        <p style="font-size:0.88rem;color:var(--text2);">Un attaquant peut connecter un switch avec une priorité basse → il devient Root Bridge → reconfiguration de tout STP → DoS ou man-in-the-middle !</p>
+        <div class="vuln-fix"><span class="fix-badge">FIX</span> Activer <strong>BPDU Guard</strong> sur TOUS les ports access (PortFast). Si un BPDU arrive → port err-disabled immédiatement.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="stp-rstp">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1rem;">⚡ RSTP (802.1w) — Rapid Spanning Tree</h3>
+
+      <div class="compare-grid">
+        <div class="compare-side" style="border-color:rgba(239,68,68,0.3)">
+          <h4 style="color:var(--red)">😴 STP Classique (802.1D)</h4>
+          <ul>
+            <li>⏱️ Convergence : ~50 secondes</li>
+            <li>5 états de port (Blocking, Listening, Learning, Forwarding, Disabled)</li>
+            <li>Seulement le Root Bridge génère des BPDUs</li>
+            <li>Réagit lentement aux pannes</li>
+          </ul>
+        </div>
+        <div class="compare-side" style="border-color:rgba(34,197,94,0.3)">
+          <h4 style="color:var(--green)">⚡ RSTP (802.1w)</h4>
+          <ul>
+            <li>⚡ Convergence : &lt; 1 seconde !</li>
+            <li>3 états actifs : Discarding, Learning, Forwarding</li>
+            <li>Tous les switches génèrent des BPDUs (hello 2s)</li>
+            <li>Proposition/Accord rapide entre switches</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="highlight" style="margin-top:1.5rem;">
+        <strong>PVST+</strong> (Per-VLAN Spanning Tree Plus) = une instance STP PAR VLAN → tu peux avoir des Root Bridges différents par VLAN → load balancing naturel ! Cisco l'utilise par défaut avec RSTP → <strong>RPVST+</strong>
+      </div>
+
+      <table class="fancy-table" style="margin-top:1rem;">
+        <thead><tr><th>Rôle RSTP</th><th>Fonction</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Root</strong></td><td>Port vers le Root Bridge (1 par switch)</td></tr>
+          <tr><td><strong>Designated</strong></td><td>Port qui forward sur un segment (émet des BPDUs)</td></tr>
+          <tr><td><strong>Alternate</strong></td><td>Backup du Root Port — bloqué, prêt en &lt;1 s</td></tr>
+          <tr><td><strong>Backup</strong></td><td>Backup d'un Designated sur segment partagé</td></tr>
+        </tbody>
+      </table>
+      <div class="alert alert-warning" style="margin-top:1rem;"><span class="alert-icon">⚠️</span><div><strong>Sur les ports access :</strong> <code>spanning-tree portfast</code> + <code>spanning-tree bpduguard enable</code> (ou global <code>spanning-tree portfast bpduguard default</code>). <strong>Sur uplinks :</strong> <code>spanning-tree guard root</code> pour empêcher un switch access de devenir Root.</div></div>
+
+      <div class="code-block" data-label="Activer RSTP">
+<pre><span class="comment"># Changer STP mode :</span>
+<span class="cmd">SW(config)# spanning-tree mode rapid-pvst</span>
+
+<span class="comment"># Vérifier :</span>
+<span class="cmd">SW# show spanning-tree | include mode</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ETHERCHANNEL ===== -->
+<!-- ===== ETHERCHANNEL ===== -->
+<div class="section" id="section-etherchannel">
+  <div class="section-header">
+    <div class="section-title">🔗 EtherChannel</div>
+    <p class="section-desc">Agrégation de liens pour plus de bande passante et redondance</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('eth','theorie', this)">📚 Théorie</button>
+    <button class="subtab" onclick="showSubtab('eth','protocoles', this)">⚙️ LACP vs PAgP</button>
+    <button class="subtab" onclick="showSubtab('eth','config', this)">💻 Configuration</button>
+    <button class="subtab" onclick="showSubtab('eth','securite', this)">🛡️ Sécurité</button>
+  </div>
+
+  <!-- ONGLE T1 : THEORIE -->
+  <div class="subcontent active" id="eth-theorie">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--orange);margin-bottom:1rem;">🔗 C'est quoi l'EtherChannel ?</h3>
+
+      <p style="color:var(--text2);line-height:1.8;margin-bottom:1.5rem;">L'EtherChannel regroupe <strong style="color:var(--ink)">jusqu'à 8 liens physiques</strong> en un seul <strong style="color:var(--ink)">lien logique (Port-Channel)</strong>. Résultat : plus de bande passante + redondance si un lien tombe !</p>
+
+      <div class="packet-path">
+        <div class="packet-node" style="border-color:var(--orange);color:var(--orange)">SW1</div>
+        <div class="packet-wire" style="background:linear-gradient(90deg,var(--orange),var(--yellow))"><div class="packet-dot" style="background:var(--orange)"></div></div>
+        <div class="packet-node" style="border-color:var(--yellow);color:var(--yellow)">Po1<br><small>4x1Gbps = 4Gbps</small></div>
+        <div class="packet-wire" style="background:linear-gradient(90deg,var(--yellow),var(--orange))"><div class="packet-dot" style="background:var(--yellow);animation-delay:0.3s"></div></div>
+        <div class="packet-node" style="border-color:var(--orange);color:var(--orange)">SW2</div>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="content-panel" style="border-color:rgba(59,130,246,0.3)">
+          <h4 style="color:var(--blue);font-weight:800;margin-bottom:1rem;">🔵 EtherChannel L2</h4>
+          <ul style="list-style:none;color:var(--text2);font-size:0.88rem;line-height:2;">
+            <li>📍 Pour switches Access/Distribution</li>
+            <li>📦 Regroupe des ports d'accès (VLANs)</li>
+            <li>📡 Basé sur adresses MAC</li>
+            <li>🔌 Idéal pour les trunks multi-VLAN</li>
+          </ul>
+        </div>
+        <div class="content-panel" style="border-color:rgba(34,197,94,0.3)">
+          <h4 style="color:var(--green);font-weight:800;margin-bottom:1rem;">🟢 EtherChannel L3</h4>
+          <ul style="list-style:none;color:var(--text2);font-size:0.88rem;line-height:2;">
+            <li>📍 Pour les switches Core/Distribution L3</li>
+            <li>🌐 Chaque Port-Channel a une IP</li>
+            <li>🚀 Basé sur adresses IP</li>
+            <li>🔀 Idéal pour le routage inter-VLAN</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="alert alert-warning">
+        <span class="alert-icon">⚠️</span>
+        <div><strong>ATTENTION !</strong> EtherChannel ≠ Haute Disponibilité (HA). Si le switch entier tombe, le Port-Channel tombe aussi. C'est de l'agrégation, pas de la redondance d'équipements !</div>
+      </div>
+
+      <div class="alert alert-success">
+        <span class="alert-icon">✨</span>
+        <div><strong>Avantage STP :</strong> STP voit le Port-Channel comme UN SEUL lien → pas de blocage STP sur les liens agrégés → toute la bande passante utilisée !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLET 2 : PROTOCOLES (LACP vs PAgP) -->
+  <div class="subcontent" id="eth-protocoles">
+    <div class="content-panel">
+      <!-- J'ai fusionné ton texte sur la répartition de charge ici au bon endroit -->
+      <div class="highlight" style="margin-bottom:1.5rem;"><strong>Répartition de charge :</strong> un flux = même paire (MAC ou IP selon <code>port-channel load-balance</code>). Plusieurs flux peuvent utiliser des liens différents ; <em>un seul</em> gros flux ne dépasse jamais la vitesse d'un membre (ex. 1 Gbps sur Po1 à 4×1G).</div>
+
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--purple);margin-bottom:1rem;">⚙️ LACP vs PAgP</h3>
+
+      <div class="compare-grid">
+        <div class="compare-side" style="border-color:rgba(59,130,246,0.3)">
+          <h4 style="color:var(--blue)">🌍 LACP (802.3ad)</h4>
+          <ul>
+            <li>✅ Standard IEEE → multi-vendor</li>
+            <li>🔄 Active : initie la négociation</li>
+            <li>⏳ Passive : attend la négociation</li>
+            <li>Active-Active ✅ | Active-Passive ✅</li>
+            <li>Passive-Passive ❌ (aucun n'initie)</li>
+            <li>Max 16 liens (8 actifs + 8 standby)</li>
+          </ul>
+        </div>
+        <div class="compare-side" style="border-color:rgba(249,115,22,0.3)">
+          <h4 style="color:var(--orange)">🔒 PAgP (Port Aggregation Protocol)</h4>
+          <ul>
+            <li>⚠️ Propriétaire Cisco uniquement</li>
+            <li>🔄 Desirable : initie la négociation</li>
+            <li>⏳ Auto : attend la négociation</li>
+            <li>Desirable-Desirable ✅ | Desirable-Auto ✅</li>
+            <li>Auto-Auto ❌ (aucun n'initie)</li>
+            <li>Max 8 liens par Port-Channel</li>
+          </ul>
+        </div>
+      </div>
+
+      <table class="fancy-table" style="margin-top:1.5rem;">
+        <thead><tr><th>Protocole</th><th>Mode SW1</th><th>Mode SW2</th><th>Résultat</th></tr></thead>
+        <tbody>
+          <tr><td>LACP</td><td>Active</td><td>Active</td><td>✅ EtherChannel formé</td></tr>
+          <tr><td>LACP</td><td>Active</td><td>Passive</td><td>✅ EtherChannel formé</td></tr>
+          <tr><td>LACP</td><td>Passive</td><td>Passive</td><td>❌ Pas d'EtherChannel</td></tr>
+          <tr><td>PAgP</td><td>Desirable</td><td>Desirable</td><td>✅ EtherChannel formé</td></tr>
+          <tr><td>PAgP</td><td>Desirable</td><td>Auto</td><td>✅ EtherChannel formé</td></tr>
+          <tr><td>PAgP</td><td>Auto</td><td>Auto</td><td>❌ Pas d'EtherChannel</td></tr>
+          <tr><td>Manuel</td><td>On</td><td>On</td><td>✅ Forcé (sans négociation)</td></tr>
+        </tbody>
+      </table>
+
+      <div class="sticky-note green" style="max-width:400px; margin-top: 1rem;">
+        🎓 <strong>Recommandation :</strong> Utilise toujours <strong>LACP</strong> — c'est le standard ! PAgP ne fonctionne qu'entre switches Cisco. Évite "On" en production car pas de vérification.
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLET 3 : CONFIGURATION -->
+  <div class="subcontent" id="eth-config">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">💻 Configuration EtherChannel</h3>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">SW1 & SW2 — EtherChannel LACP L2</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== SW1 Configuration =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface range g0/1 - 4</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport trunk encapsulation dot1q</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> switchport mode trunk</span>
+<span class="t-prompt">SW1(config-if-range)#</span><span class="t-cmd"> channel-group 1 mode active</span>
+<span class="t-out">Creating a port-channel interface Port-channel 1</span>
+
+<span class="t-warn">! ===== Configurer l'interface logique Port-Channel =====</span>
+<span class="t-prompt">SW1(config)#</span><span class="t-cmd"> interface port-channel 1</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk encapsulation dot1q</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport mode trunk</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk native vlan 99</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> switchport trunk allowed vlan 10,20,30,99</span>
+<span class="t-prompt">SW1(config-if)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== SW2 Configuration (mode passive) =====</span>
+<span class="t-prompt">SW2(config)#</span><span class="t-cmd"> interface range g0/1 - 4</span>
+<span class="t-prompt">SW2(config-if-range)#</span><span class="t-cmd"> channel-group 1 mode passive</span>
+
+<span class="t-warn">! ===== Vérification =====</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show etherchannel summary</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show etherchannel port-channel</span>
+<span class="t-prompt">SW1#</span><span class="t-cmd"> show interfaces port-channel 1</span>
+<span class="t-out">Port-channel1 is up, line protocol is up (connected)</span>
+<span class="t-out">  Hardware is EtherChannel, address is ...</span>
+<span class="t-out">  Members in this channel: Gi0/1 Gi0/2 Gi0/3 Gi0/4</span>
+        </div>
+      </div>
+
+      <div class="alert alert-danger">
+        <span class="alert-icon">🚨</span>
+        <div><strong>Règle CRITIQUE !</strong> Tous les membres d'un EtherChannel doivent avoir les MÊMES paramètres : même vitesse, duplex, mode switchport, VLANs autorisés. Une différence → le lien ne se forme pas !</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONGLET 4 : SECURITE -->
+  <div class="subcontent" id="eth-securite">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--red);margin-bottom:1rem;">🛡️ Sécurité EtherChannel</h3>
+      <div class="vuln-card">
+        <div class="vuln-header"><span class="vuln-badge">MOYEN</span><span class="vuln-title">⚡ EtherChannel Misconfiguration Attack</span></div>
+        <p style="font-size:0.88rem;color:var(--text2);">Si un port EtherChannel est mal configuré, STP peut créer des loops car il voit les liens individuels au lieu du Port-Channel logique.</p>
+        <div class="vuln-fix"><span class="fix-badge">FIX</span> Toujours configurer les ports membres AVANT de créer le Port-Channel. Vérifier avec <code>show etherchannel summary</code> — chercher le flag (P) = in Port-channel.</div>
+      </div>
+      <div class="sticky-note" style="max-width:400px;margin-top:1rem;">
+        📌 Dans <code>show etherchannel summary</code> :<br>
+        <strong>P</strong> = Port dans le channel ✅<br>
+        <strong>I</strong> = Stand-alone (problème!) ❌<br>
+        <strong>D</strong> = Down ❌<br>
+        <strong>s</strong> = Suspended ❌
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DHCP ===== -->
+<div class="section" id="section-dhcp">
+  <div class="section-header">
+    <div class="section-title">📡 DHCP — Dynamic Host Configuration Protocol</div>
+    <p class="section-desc">Attribution automatique d'adresses IP via le processus DORA</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('dhcp','dora', this)">🎯 Processus DORA</button>
+    <button class="subtab" onclick="showSubtab('dhcp','config', this)">⚙️ Configuration Cisco</button>
+    <button class="subtab" onclick="showSubtab('dhcp','relay', this)">📡 DHCP Relay</button>
+    <button class="subtab" onclick="showSubtab('dhcp','securite', this)">🛡️ Sécurité DHCP</button>
+  </div>
+
+  <div class="subcontent active" id="dhcp-dora">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">🎯 Le Processus DORA</h3>
+
+      <div class="dora-steps">
+        <div class="dora-step" onclick="showDoraDetail('discover')" style="border-color:var(--blue);cursor:pointer;">
+          <span class="dora-letter" style="color:var(--blue)">D</span>
+          <div class="dora-name">DISCOVER</div>
+          <div class="dora-desc">Client cherche un serveur DHCP (broadcast)</div>
+        </div>
+        <div class="dora-step" onclick="showDoraDetail('offer')" style="border-color:var(--green);cursor:pointer;">
+          <span class="dora-letter" style="color:var(--green)">O</span>
+          <div class="dora-name">OFFER</div>
+          <div class="dora-desc">Serveur propose une adresse IP</div>
+        </div>
+        <div class="dora-step" onclick="showDoraDetail('request')" style="border-color:var(--orange);cursor:pointer;">
+          <span class="dora-letter" style="color:var(--orange)">R</span>
+          <div class="dora-name">REQUEST</div>
+          <div class="dora-desc">Client accepte l'offre (broadcast)</div>
+        </div>
+        <div class="dora-step" onclick="showDoraDetail('ack')" style="border-color:var(--pink);cursor:pointer;">
+          <span class="dora-letter" style="color:var(--pink)">A</span>
+          <div class="dora-name">ACKNOWLEDGE</div>
+          <div class="dora-desc">Serveur confirme l'attribution</div>
+        </div>
+      </div>
+
+      <div id="doraDetail" class="content-panel" style="border-color:rgba(34,197,94,0.3);margin-top:1rem;display:none;">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="notebook" style="margin-top:1.5rem;">
+        <h4>📊 Détail des messages DHCP</h4>
+        <p><strong>DISCOVER</strong> : S.IP=0.0.0.0 | D.IP=255.255.255.255 | S.MAC=Client | D.MAC=FF:FF:FF:FF:FF:FF</p>
+        <p><strong>OFFER</strong> : S.IP=192.168.1.1 | D.IP=255.255.255.255 | S.MAC=Serveur | D.MAC=Client</p>
+        <p><strong>REQUEST</strong> : S.IP=0.0.0.0 | D.IP=255.255.255.255 | S.MAC=Client | D.MAC=Serveur</p>
+        <p><strong>ACK</strong> : S.IP=192.168.1.1 | D.IP=255.255.255.255 | S.MAC=Serveur | D.MAC=Client</p>
+        <br>
+        <p>💡 Protocole : <strong>UDP</strong> | Port serveur : <strong>67</strong> | Port client : <strong>68</strong></p>
+      </div>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">🤔</span>
+        <div><strong>Pourquoi DISCOVER et REQUEST sont en broadcast ?</strong><br>
+        DISCOVER : le client ne connaît pas encore l'IP du serveur → broadcast obligatoire.<br>
+        REQUEST : plusieurs serveurs peuvent avoir répondu → le client broadcaste pour que TOUS les serveurs sachent qu'il a choisi le premier qui a répondu (les autres retirent l'offre).</div>
+      </div>
+      <table class="fancy-table" style="margin-top:1.5rem;">
+        <thead><tr><th>Option DHCP</th><th>Code</th><th>Usage admin</th></tr></thead>
+        <tbody>
+          <tr><td>Subnet Mask</td><td>1</td><td>Masque réseau</td></tr>
+          <tr><td>Router</td><td>3</td><td>Passerelle par défaut</td></tr>
+          <tr><td>DNS Server</td><td>6</td><td>Résolveurs internes / secours</td></tr>
+          <tr><td>Domain Name</td><td>15</td><td>Suffixe DNS (Active Directory)</td></tr>
+          <tr><td>Lease Time</td><td>51</td><td>Durée du bail</td></tr>
+          <tr><td>TFTP / Bootfile</td><td>66–67</td><td>PXE, déploiement d'images</td></tr>
+        </tbody>
+      </table>
+      <div class="alert alert-warning" style="margin-top:1rem;"><span class="alert-icon">⚠️</span><div><strong>DHCPDECLINE</strong> : IP refusée (conflit). <strong>DHCPRELEASE</strong> : libération propre. Vérifier <code>show ip dhcp binding</code> et <code>show ip dhcp conflict</code>.</div></div>
+
+    </div>
+  </div>
+  <div class="subcontent" id="dhcp-config">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1rem;">⚙️ Configuration Serveur DHCP sur Cisco IOS</h3>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">R1 — Serveur DHCP Cisco</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== Exclure les IPs réservées =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dhcp excluded-address 192.168.10.1 192.168.10.10</span>
+<span class="t-out"># Réserve .1 à .10 (routeur, serveurs, etc.)</span>
+
+<span class="t-warn">! ===== Créer le Pool DHCP VLAN 10 (HR) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dhcp pool VLAN10-HR</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> network 192.168.10.0 255.255.255.0</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> default-router 192.168.10.1</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> dns-server 8.8.8.8 8.8.4.4</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> domain-name hr.entreprise.local</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> lease 7</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Pool VLAN 20 (SALES) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dhcp excluded-address 192.168.20.1 192.168.20.10</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dhcp pool VLAN20-SALES</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> network 192.168.20.0 255.255.255.0</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> default-router 192.168.20.1</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> dns-server 8.8.8.8</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> lease 3</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Vérification =====</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ip dhcp pool</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ip dhcp binding</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ip dhcp conflict</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ip dhcp server statistics</span>
+
+<span class="t-warn">! ===== DHCP Statique (IP fixe par MAC) =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dhcp pool SERVER1</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> host 192.168.10.100 255.255.255.0</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> hardware-address 0050.7966.6800</span>
+<span class="t-prompt">R1(dhcp-config)#</span><span class="t-cmd"> client-name SERVER1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="dhcp-relay">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--orange);margin-bottom:1rem;">📡 DHCP Relay Agent (ip helper-address)</h3>
+
+      <div class="highlight">
+        Le DHCP fonctionne par <strong>broadcast</strong> — mais les broadcasts ne traversent pas les routeurs ! Si ton serveur DHCP est dans un autre réseau/VLAN, tu as besoin d'un <strong>DHCP Relay Agent</strong>.
+      </div>
+
+      <div class="packet-path">
+        <div class="packet-node" style="border-color:var(--blue)">PC Client<br><small>VLAN 10</small></div>
+        <div class="packet-wire"><div class="packet-dot"></div></div>
+        <div class="packet-node" style="border-color:var(--pink)">R1<br><small>Relay Agent</small></div>
+        <div class="packet-wire"><div class="packet-dot" style="animation-delay:0.4s"></div></div>
+        <div class="packet-node" style="border-color:var(--green)">DHCP Server<br><small>192.168.1.10</small></div>
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">R1 — DHCP Relay Agent</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! Sur l'interface côté clients (sous-interface ou interface VLAN)</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip helper-address 192.168.1.10</span>
+<span class="t-out"># R1 convertit le broadcast DHCP en unicast vers 192.168.1.10</span>
+
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.20</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ip helper-address 192.168.1.10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! Vérification</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ip interface g0/0.10 | include helper</span>
+<span class="t-out">  Helper address is 192.168.1.10</span>
+        </div>
+      </div>
+
+      <div class="sticky-note blue" style="max-width:400px;">
+        💡 <code>ip helper-address</code> ne fait pas que relayer DHCP — il relaie aussi d'autres services broadcast (TFTP, NetBIOS, Time...). Pour limiter à DHCP uniquement → voir <code>ip forward-protocol udp</code>.
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="dhcp-securite">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--red);margin-bottom:1rem;">🛡️ Sécurité DHCP</h3>
+
+      <div class="vuln-card">
+        <div class="vuln-header"><span class="vuln-badge">CRITIQUE</span><span class="vuln-title">🎭 DHCP Starvation + Rogue DHCP Server</span></div>
+        <p style="font-size:0.88rem;color:var(--text2);">
+          <strong>Phase 1 — Starvation :</strong> L'attaquant envoie des milliers de DISCOVER avec des MACs spoofés → le pool DHCP légitime se vide → plus d'adresses disponibles.<br><br>
+          <strong>Phase 2 — Rogue Server :</strong> L'attaquant lance son propre serveur DHCP → distribue de fausses IPs avec lui comme gateway → Man-in-the-Middle !
+        </p>
+        <div class="vuln-fix"><span class="fix-badge">FIX</span> DHCP Snooping — le switch filtre les messages DHCP et ne permet aux réponses DHCP que sur les ports "trusted".</div>
+      </div>
+
+      <div class="terminal" style="margin-top:1rem;">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">SW — DHCP Snooping Configuration</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== Activer DHCP Snooping globalement =====</span>
+<span class="t-prompt">SW(config)#</span><span class="t-cmd"> ip dhcp snooping</span>
+<span class="t-prompt">SW(config)#</span><span class="t-cmd"> ip dhcp snooping vlan 10,20,30</span>
+
+<span class="t-warn">! ===== Port Trusted (vers le serveur DHCP / routeur) =====</span>
+<span class="t-prompt">SW(config)#</span><span class="t-cmd"> interface g0/1</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> ip dhcp snooping trust</span>
+<span class="t-out"># SEUL ce port peut envoyer des OFFER/ACK DHCP</span>
+
+<span class="t-warn">! ===== Limiter les DISCOVER (anti-starvation) =====</span>
+<span class="t-prompt">SW(config)#</span><span class="t-cmd"> interface range fa0/1 - 24</span>
+<span class="t-prompt">SW(config-if-range)#</span><span class="t-cmd"> ip dhcp snooping limit rate 15</span>
+<span class="t-out"># Max 15 paquets DHCP/seconde par port — au-delà → err-disabled</span>
+
+<span class="t-prompt">SW#</span><span class="t-cmd"> show ip dhcp snooping binding</span>
+<span class="t-out">MacAddress     IpAddress      Lease   Type    VLAN  Interface</span>
+<span class="t-out">0050.7966.01   192.168.10.11  86400   dhcp-snooping 10  Fa0/1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DHCPv6 ===== -->
+<div class="section" id="section-dhcpv6">
+  <div class="section-header">
+    <div class="section-title">🌍 DHCPv6 — DHCP pour IPv6</div>
+    <p class="section-desc">Stateful, Stateless, SLAAC — le processus SARR expliqué</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('dhcpv6','sarr', this)">🔄 Processus SARR</button>
+    <button class="subtab" onclick="showSubtab('dhcpv6','types', this)">📊 Stateful vs Stateless</button>
+    <button class="subtab" onclick="showSubtab('dhcpv6','config', this)">⚙️ Configuration</button>
+  </div>
+
+  <div class="subcontent active" id="dhcpv6-sarr">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--purple);margin-bottom:1rem;">🔄 Le Processus SARR (DHCPv6 Stateful)</h3>
+
+      <div class="dora-steps">
+        <div class="dora-step" style="border-color:var(--blue)">
+          <span class="dora-letter" style="color:var(--blue)">S</span>
+          <div class="dora-name">SOLICIT</div>
+          <div class="dora-desc">Client cherche un serveur DHCPv6 (multicast ff02::1:2)</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--green)">
+          <span class="dora-letter" style="color:var(--green)">A</span>
+          <div class="dora-name">ADVERTISE</div>
+          <div class="dora-desc">Serveur propose ses services (Unicast/Multicast)</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--orange)">
+          <span class="dora-letter" style="color:var(--orange)">R</span>
+          <div class="dora-name">REQUEST</div>
+          <div class="dora-desc">Client choisit un serveur et demande l'adresse</div>
+        </div>
+        <div class="dora-step" style="border-color:var(--pink)">
+          <span class="dora-letter" style="color:var(--pink)">R</span>
+          <div class="dora-name">REPLY</div>
+          <div class="dora-desc">Serveur envoie l'adresse IPv6 + options en Unicast</div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <span class="alert-icon">🌐</span>
+        <div><strong>Différences vs DHCP v4 :</strong><br>
+        • DHCPv6 utilise le <strong>multicast</strong> (ff02::1:2) — pas le broadcast (IPv6 n'a pas de broadcast !)<br>
+        • Ports : <strong>546 (client)</strong> et <strong>547 (serveur)</strong> UDP<br>
+        • La <strong>Link-Local address (fe80::)</strong> est utilisée pour la communication initiale</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="dhcpv6-types">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1rem;">📊 Stateful vs Stateless vs SLAAC</h3>
+
+      <div class="grid grid-3">
+        <div class="content-panel" style="border-color:rgba(239,68,68,0.3)">
+          <h4 style="color:var(--red);font-weight:800;margin-bottom:0.8rem;">🔴 Stateful DHCPv6</h4>
+          <ul style="list-style:none;color:var(--text2);font-size:0.85rem;line-height:2;">
+            <li>✅ Serveur gère les adresses</li>
+            <li>✅ Gère aussi DNS, domaine...</li>
+            <li>✅ Registre des liaisons (bindings)</li>
+            <li>⚙️ Processus SARR complet</li>
+            <li>🔧 Similaire au DHCPv4</li>
+          </ul>
+        </div>
+        <div class="content-panel" style="border-color:rgba(249,115,22,0.3)">
+          <h4 style="color:var(--orange);font-weight:800;margin-bottom:0.8rem;">🟠 Stateless DHCPv6</h4>
+          <ul style="list-style:none;color:var(--text2);font-size:0.85rem;line-height:2;">
+            <li>✅ Client génère son adresse (SLAAC)</li>
+            <li>✅ Serveur fournit DNS, options</li>
+            <li>❌ Serveur ne gère PAS les IPs</li>
+            <li>⚡ Plus léger côté serveur</li>
+            <li>🔧 Flag O=1 dans le RA</li>
+          </ul>
+        </div>
+        <div class="content-panel" style="border-color:rgba(34,197,94,0.3)">
+          <h4 style="color:var(--green);font-weight:800;margin-bottom:0.8rem;">🟢 SLAAC (Sans DHCP)</h4>
+          <ul style="list-style:none;color:var(--text2);font-size:0.85rem;line-height:2;">
+            <li>✅ 100% autonome — pas de serveur</li>
+            <li>✅ Préfixe du RA + EUI-64/Random</li>
+            <li>❌ Pas de DNS automatique</li>
+            <li>⚡ Très simple à déployer</li>
+            <li>🔧 Flag M=0 O=0 dans le RA</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="notebook">
+        <h4>🚦 Les flags du Router Advertisement (RA)</h4>
+        <p><strong>Flag M (Managed) = 1</strong> → Utiliser DHCPv6 Stateful (M pour Managed address)</p>
+        <p><strong>Flag O (Other) = 1</strong> → Utiliser DHCPv6 Stateless pour les options (DNS...)</p>
+        <p><strong>M=0, O=0</strong> → SLAAC uniquement</p>
+        <p><strong>M=1, O=1</strong> → DHCPv6 Stateful complet</p>
+        <p><strong>M=0, O=1</strong> → SLAAC + DHCPv6 Stateless (pour DNS seulement)</p>
+      </div>
+      <div class="highlight" style="margin-top:1rem;"><strong>IPv6 en prod :</strong> souvent SLAAC pour l'adresse + DHCPv6 stateless pour DNS. Pense aux adresses <strong>temporaires (privacy)</strong> et à la documentation des préfixes /64 par VLAN.</div>
+
+    </div>
+  </div>
+
+  <div class="subcontent" id="dhcpv6-config">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1rem;">⚙️ Configuration DHCPv6</h3>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">R1 — DHCPv6 Stateful Configuration</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! ===== Activer IPv6 Unicast Routing =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ipv6 unicast-routing</span>
+
+<span class="t-warn">! ===== Créer le pool DHCPv6 =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ipv6 dhcp pool POOL-VLAN10</span>
+<span class="t-prompt">R1(config-dhcpv6)#</span><span class="t-cmd"> address prefix 2001:db8:10::/64 lifetime 172800 86400</span>
+<span class="t-prompt">R1(config-dhcpv6)#</span><span class="t-cmd"> dns-server 2001:4860:4860::8888</span>
+<span class="t-prompt">R1(config-dhcpv6)#</span><span class="t-cmd"> domain-name hr.entreprise.local</span>
+<span class="t-prompt">R1(config-dhcpv6)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Assigner le pool à l'interface =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> interface g0/0.10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ipv6 address 2001:db8:10::1/64</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ipv6 dhcp server POOL-VLAN10</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> ipv6 nd managed-config-flag</span>
+<span class="t-out"># Met M=1 dans le RA → clients utilisent DHCPv6 Stateful</span>
+<span class="t-prompt">R1(config-subif)#</span><span class="t-cmd"> exit</span>
+
+<span class="t-warn">! ===== Vérification =====</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ipv6 dhcp pool</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ipv6 dhcp binding</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show ipv6 interface g0/0.10</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DNS ===== -->
+<div class="section" id="section-dns">
+  <div class="section-header">
+    <div class="section-title">🔍 DNS — Domain Name System</div>
+    <p class="section-desc">La traduction entre noms de domaine et adresses IP</p>
+  </div>
+
+  <div class="content-panel">
+    <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1rem;">🌐 Comment fonctionne le DNS ?</h3>
+
+    <div class="dora-steps" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="dora-step" style="border-color:var(--blue)">
+        <span style="font-size:2rem;">💻</span>
+        <div class="dora-name">Client</div>
+        <div class="dora-desc">Tape "google.com"</div>
+      </div>
+      <div class="dora-step" style="border-color:var(--orange)">
+        <span style="font-size:2rem;">🏠</span>
+        <div class="dora-name">Cache Local</div>
+        <div class="dora-desc">Vérifie le cache local d'abord</div>
+      </div>
+      <div class="dora-step" style="border-color:var(--purple)">
+        <span style="font-size:2rem;">🔄</span>
+        <div class="dora-name">DNS Resolver</div>
+        <div class="dora-desc">Requête au résolveur récursif</div>
+      </div>
+      <div class="dora-step" style="border-color:var(--green)">
+        <span style="font-size:2rem;">👑</span>
+        <div class="dora-name">Root Server</div>
+        <div class="dora-desc">Qui gère ".com" ?</div>
+      </div>
+      <div class="dora-step" style="border-color:var(--pink)">
+        <span style="font-size:2rem;">🎯</span>
+        <div class="dora-name">TLD Server</div>
+        <div class="dora-desc">Qui gère "google.com" ?</div>
+      </div>
+      <div class="dora-step" style="border-color:var(--cyan)">
+        <span style="font-size:2rem;">✅</span>
+        <div class="dora-name">Auth. Server</div>
+        <div class="dora-desc">142.250.74.46 !</div>
+      </div>
+    </div>
+
+    <table class="fancy-table">
+      <thead><tr><th>Type de Lookup</th><th>Direction</th><th>Exemple</th><th>Zone</th></tr></thead>
+      <tbody>
+        <tr><td>🔵 <strong>Forward Lookup</strong></td><td>Nom → IP</td><td>google.com → 142.250.74.46</td><td>Forward Lookup Zone</td></tr>
+        <tr><td>🟠 <strong>Reverse Lookup</strong></td><td>IP → Nom</td><td>142.250.74.46 → google.com</td><td>Reverse Lookup Zone (in-addr.arpa)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="highlight">
+      DNS utilise le port <strong>53 UDP</strong> pour la plupart des requêtes (rapide). Il bascule sur <strong>TCP</strong> quand la réponse dépasse 512 octets (transferts de zone, réponses larges).
+    </div>
+
+    <div class="content-panel" style="margin-top:1rem;border-color:rgba(91,143,217,0.3);">
+      <h4 style="font-weight:800;color:var(--ink);margin-bottom:0.75rem;">📌 Niveau pro — DNS</h4>
+      <ul style="color:var(--text2);font-size:0.9rem;line-height:1.85;margin-left:1.2rem;">
+        <li><strong>TTL</strong> : durée de cache — TTL bas = changements plus rapides, plus de charge DNS.</li>
+        <li><strong>Split DNS</strong> : résolution interne (AD) vs externe (forwarders 8.8.8.8) — ne pas exposer la zone interne.</li>
+        <li><strong>DNSSEC</strong> : chaîne de confiance (DS/DNSKEY) — bloque l'empoisonnement de cache si le résolveur valide.</li>
+        <li><strong>Outils</strong> : <code>nslookup</code>, <code>dig</code>, <code>show hosts</code> — toujours tester forward <em>et</em> reverse (PTR) pour les serveurs.</li>
+      </ul>
+    </div>
+
+    <div class="grid grid-2" style="margin-top:1.5rem;">
+      <div class="content-panel" style="border-color:rgba(168,85,247,0.3)">
+        <h4 style="color:var(--purple);font-weight:800;margin-bottom:1rem;">📋 Types d'enregistrements DNS</h4>
+        <table class="fancy-table">
+          <thead><tr><th>Type</th><th>Rôle</th></tr></thead>
+          <tbody>
+            <tr><td><code>A</code></td><td>Nom → IPv4</td></tr>
+            <tr><td><code>AAAA</code></td><td>Nom → IPv6</td></tr>
+            <tr><td><code>CNAME</code></td><td>Alias → nom canonique</td></tr>
+            <tr><td><code>MX</code></td><td>Mail Exchange (email)</td></tr>
+            <tr><td><code>NS</code></td><td>Nameserver de la zone</td></tr>
+            <tr><td><code>PTR</code></td><td>IP → Nom (reverse)</td></tr>
+            <tr><td><code>SOA</code></td><td>Autorité de la zone</td></tr>
+            <tr><td><code>TXT</code></td><td>Infos texte (SPF, DKIM...)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div class="vuln-card">
+          <div class="vuln-header"><span class="vuln-badge">ÉLEVÉ</span><span class="vuln-title">☠️ DNS Spoofing / Cache Poisoning</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">Un attaquant empoisonne le cache DNS → une requête vers "bank.com" retourne l'IP de l'attaquant → phishing !</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> Utiliser <strong>DNSSEC</strong> pour signer cryptographiquement les réponses DNS. Configurer des timeouts de cache courts.</div>
+        </div>
+        <div class="vuln-card" style="margin-top:1rem;">
+          <div class="vuln-header"><span class="vuln-badge">MOYEN</span><span class="vuln-title">🔍 DNS Tunneling</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">Exfiltrer des données cachées dans des requêtes DNS — difficile à détecter car DNS est rarement bloqué !</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> Surveiller les requêtes DNS anormalement longues ou fréquentes. Utiliser un <strong>DNS Firewall</strong>.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="terminal" style="margin-top:1.5rem;">
+      <div class="terminal-bar">
+        <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+        <div class="terminal-title">DNS sur Cisco IOS — Configuration</div>
+      </div>
+      <div class="terminal-body">
+<span class="t-warn">! ===== Configurer un serveur DNS sur Cisco IOS =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip dns server</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip domain-name entreprise.local</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip name-server 8.8.8.8 8.8.4.4</span>
+
+<span class="t-warn">! ===== Entrées DNS statiques =====</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip host SW1 192.168.1.2</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip host SERVER1 192.168.1.10</span>
+
+<span class="t-warn">! ===== Tester depuis IOS =====</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> nslookup google.com</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> ping google.com</span>
+<span class="t-prompt">R1#</span><span class="t-cmd"> show hosts</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECURITE ===== -->
+<div class="section" id="section-securite">
+  <div class="section-header">
+    <div class="section-title">🛡️ Sécurité Réseau</div>
+    <p class="section-desc">Vulnérabilités, attaques, bonnes pratiques et mitigation</p>
+  </div>
+
+  <div class="subtabs">
+    <button class="subtab active" onclick="showSubtab('sec','attaques', this)">⚔️ Attaques Communes</button>
+    <button class="subtab" onclick="showSubtab('sec','port-sec', this)">🔐 Port Security</button>
+    <button class="subtab" onclick="showSubtab('sec','bonnes-pratiques', this)">✅ Bonnes Pratiques</button>
+    <button class="subtab" onclick="showSubtab('sec','scenarios', this)">🎭 Scénarios</button>
+  </div>
+
+  <div class="subcontent active" id="sec-attaques">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--red);margin-bottom:1.5rem;">⚔️ Attaques sur les Réseaux Commutés</h3>
+
+      <div class="highlight" style="margin-bottom:1.5rem;">
+        <strong>Défense en profondeur (L2/L3) :</strong> segmentation VLAN → durcissement des ports (access + nonegotiate) → Port Security → DHCP Snooping → DAI → ACL sur L3 → SSH/AAA → logs centralisés (Syslog + NTP). Un seul contrôle ne suffit jamais.
+      </div>
+
+      <div class="grid grid-2">
+        <div class="vuln-card">
+          <div class="vuln-header"><span class="vuln-badge">CRITIQUE</span><span class="vuln-title">💾 MAC Address Flooding</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">L'attaquant inonde le switch avec des milliers de MACs faux → la table CAM se remplit → le switch ne sait plus où envoyer les trames → il les broadcast partout (fail-open) → sniffing possible !</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> <strong>Port Security</strong> — limiter le nombre de MACs par port.</div>
+        </div>
+
+        <div class="vuln-card">
+          <div class="vuln-header"><span class="vuln-badge">ÉLEVÉ</span><span class="vuln-title">🎭 ARP Spoofing / Poisoning</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">L'attaquant envoie de fausses réponses ARP → les victimes associent l'IP du routeur à la MAC de l'attaquant → tout le trafic passe par l'attaquant (MitM) !</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> <strong>Dynamic ARP Inspection (DAI)</strong> + DHCP Snooping.</div>
+        </div>
+
+        <div class="vuln-card">
+          <div class="vuln-header"><span class="vuln-badge">ÉLEVÉ</span><span class="vuln-title">🏷️ VLAN Hopping</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">Via DTP Spoofing ou Double Tagging, l'attaquant accède à des VLANs auxquels il ne devrait pas avoir accès.</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> Désactiver DTP (<code>switchport nonegotiate</code>), changer le Native VLAN.</div>
+        </div>
+
+        <div class="vuln-card">
+          <div class="vuln-header"><span class="vuln-badge">MOYEN</span><span class="vuln-title">📡 STP Manipulation</span></div>
+          <p style="font-size:0.88rem;color:var(--text2);">L'attaquant envoie de faux BPDUs pour devenir Root Bridge → reconfiguration de la topologie → MitM ou DoS.</p>
+          <div class="vuln-fix"><span class="fix-badge">FIX</span> <strong>BPDU Guard</strong> sur tous les ports access. <strong>Root Guard</strong> sur les ports designated.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="sec-port-sec">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--orange);margin-bottom:1rem;">🔐 Port Security</h3>
+
+      <div class="highlight">
+        <strong>Port Security</strong> permet de limiter le nombre d'adresses MAC autorisées sur un port de switch. Si une adresse non autorisée est détectée → action configurée (shutdown, restrict, protect).
+      </div>
+
+      <div class="terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div>
+          <div class="terminal-title">SW — Port Security Configuration</div>
+        </div>
+        <div class="terminal-body">
+<span class="t-warn">! Port Security fonctionne UNIQUEMENT sur les ports access !</span>
+<span class="t-prompt">SW(config)#</span><span class="t-cmd"> interface fa0/1</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport mode access</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport port-security</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport port-security maximum 2</span>
+<span class="t-out"># Max 2 adresses MAC sur ce port</span>
+
+<span class="t-warn">! ===== Mode de violation =====</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport port-security violation shutdown</span>
+<span class="t-out"># shutdown : port err-disabled (le plus sécurisé) ← recommandé</span>
+<span class="t-out"># restrict : drop + log (garde le port up)</span>
+<span class="t-out"># protect  : drop silencieux (pas de log)</span>
+
+<span class="t-warn">! ===== MAC statique =====</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport port-security mac-address 0050.7966.6800</span>
+
+<span class="t-warn">! ===== MAC sticky (apprend et mémorise) =====</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> switchport port-security mac-address sticky</span>
+<span class="t-out"># Le switch apprend les MACs connectés et les mémorise dans running-config</span>
+
+<span class="t-warn">! ===== Vérification =====</span>
+<span class="t-prompt">SW#</span><span class="t-cmd"> show port-security</span>
+<span class="t-prompt">SW#</span><span class="t-cmd"> show port-security interface fa0/1</span>
+<span class="t-prompt">SW#</span><span class="t-cmd"> show port-security address</span>
+
+<span class="t-warn">! ===== Récupérer un port err-disabled =====</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> shutdown</span>
+<span class="t-prompt">SW(config-if)#</span><span class="t-cmd"> no shutdown</span>
+        </div>
+      </div>
+
+      <div class="sticky-note" style="max-width:400px;">
+        🔑 <strong>Sticky MAC</strong> = meilleur choix pour la prod ! Le switch apprend automatiquement les MACs connectés et les protège. Plus besoin de noter toutes les MACs manuellement !
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="sec-bonnes-pratiques">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--green);margin-bottom:1.5rem;">✅ Checklist Sécurité Admin Réseau</h3>
+
+      <div class="accordion">
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">🔒 Sécurité des mots de passe <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <div class="terminal">
+              <div class="terminal-bar"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">Hardening Passwords</div></div>
+              <div class="terminal-body">
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> enable secret Str0ng@Pass!</span>
+<span class="t-out"># 'secret' = MD5 hash — TOUJOURS préférer à 'password'</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> service password-encryption</span>
+<span class="t-out"># Chiffre tous les mots de passe en type 7 (faible mais utile)</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> security passwords min-length 12</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> login block-for 120 attempts 3 within 60</span>
+<span class="t-out"># Bloque 120s après 3 tentatives échouées en 60s</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">🖥️ Sécurité des accès distants <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <div class="terminal">
+              <div class="terminal-bar"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">SSH Hardening</div></div>
+              <div class="terminal-body">
+<span class="t-warn">! SSH v2 uniquement — JAMAIS Telnet en production !</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> hostname R1</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip domain-name entreprise.local</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> crypto key generate rsa modulus 2048</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip ssh version 2</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip ssh time-out 60</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ip ssh authentication-retries 3</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> line vty 0 4</span>
+<span class="t-prompt">R1(config-line)#</span><span class="t-cmd"> transport input ssh</span>
+<span class="t-prompt">R1(config-line)#</span><span class="t-cmd"> login local</span>
+<span class="t-prompt">R1(config-line)#</span><span class="t-cmd"> exec-timeout 10 0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">🌐 Désactiver les services inutiles <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <div class="terminal">
+              <div class="terminal-bar"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">Service Hardening</div></div>
+              <div class="terminal-body">
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no ip http server</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no ip http secure-server</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no cdp run</span>
+<span class="t-out"># CDP révèle l'info sur les équipements voisins</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no ip finger</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no ip bootp server</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no service tcp-small-servers</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> no service udp-small-servers</span>
+<span class="t-warn">! Désactiver CDP seulement sur les interfaces vers l'extérieur</span>
+<span class="t-prompt">R1(config-if)#</span><span class="t-cmd"> no cdp enable</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">🔐 AAA — Authentification centralisée <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <p style="color:var(--text2);font-size:0.88rem;line-height:1.7;margin-bottom:0.75rem;"><strong>Authentication</strong> (qui es-tu ?) · <strong>Authorization</strong> (que peux-tu faire ?) · <strong>Accounting</strong> (qu'as-tu fait ?). En entreprise : RADIUS (ISE, NPS) ou TACACS+ (Cisco).</p>
+            <div class="code-block" data-label="AAA sur IOS">
+<pre><span class="cmd">aaa new-model</span>
+<span class="cmd">radius server ISE</span>
+<span class="cmd"> address ipv4 192.168.1.50 auth-port 1812 acct-port 1813</span>
+<span class="cmd"> key 0 MonSecretRadius</span>
+<span class="cmd">aaa authentication login default group radius local</span>
+<span class="cmd">aaa authorization exec default group radius local</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">🚧 ACL — Filtrage Couche 3 <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <p style="color:var(--text2);font-size:0.88rem;line-height:1.7;margin-bottom:0.75rem;">Les <strong>ACL étendues</strong> filtrent source/destination IP, protocole et ports. Appliquées <em>in</em> ou <em>out</em> sur une interface L3. Ordre séquentiel : première règle qui matche gagne.</p>
+            <div class="code-block" data-label="Exemple ACL">
+<pre><span class="cmd">ip access-list extended ACL-VLAN10-OUT</span>
+<span class="cmd"> permit tcp 192.168.10.0 0.0.0.255 any eq 443</span>
+<span class="cmd"> permit udp 192.168.10.0 0.0.0.255 any eq 53</span>
+<span class="cmd"> deny ip any any log</span>
+<span class="cmd">interface vlan 10</span>
+<span class="cmd"> ip access-group ACL-VLAN10-OUT in</span>
+<span class="comment"># show access-lists | show ip interface vlan 10</span></pre>
+            </div>
+            <p style="color:var(--text2);font-size:0.85rem;margin-top:0.5rem;"><strong>Conseil :</strong> placer les règles les plus spécifiques en haut ; une ACL vide = tout refusé (implicit deny).</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header" onclick="toggleAccordion(this)">📊 Logging & Surveillance <span class="accordion-arrow">▼</span></button>
+          <div class="accordion-body">
+            <div class="terminal">
+              <div class="terminal-bar"><div class="terminal-dot red"></div><div class="terminal-dot yellow"></div><div class="terminal-dot green"></div><div class="terminal-title">Logging Configuration</div></div>
+              <div class="terminal-body">
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> logging on</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> logging host 192.168.1.100</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> logging trap warnings</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> service timestamps log datetime msec</span>
+<span class="t-prompt">R1(config)#</span><span class="t-cmd"> ntp server 192.168.1.100</span>
+<span class="t-out"># Synchroniser l'heure est CRUCIAL pour les logs !</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info" style="margin-top:1.25rem;">
+        <span class="alert-icon">ℹ️</span>
+        <div><strong>err-disabled :</strong> après violation Port Security, le port est coupé. Récupération : <code>shutdown</code> puis <code>no shutdown</code>, ou <code>errdisable recovery cause psecure-violation</code>. Vérifier : <code>show errdisable recovery</code>.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="subcontent" id="sec-scenarios">
+    <div class="content-panel">
+      <h3 style="font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--cyan);margin-bottom:1.5rem;">🎭 Scénarios de Sécurité</h3>
+
+      <div class="scenario-box">
+        <div class="scenario-title">🔴 Scénario 1 : ARP Spoofing / MitM Attack</div>
+        <p style="color:var(--text2);font-size:0.88rem;margin-bottom:1rem;">L'attaquant (PC Kali) est sur le même réseau que les victimes (VLAN 20 - Sales)</p>
+        <div class="scenario-chat">
+          <div class="msg info">🖥️ Réseau : 192.168.20.0/24 | PC-Victime: .50 | Routeur: .1 | Kali: .99</div>
+          <div class="msg attacker"><div class="msg-label">⚔️ Attaquant (Kali Linux)</div>Exécute : <code>arpspoof -i eth0 -t 192.168.20.50 192.168.20.1</code><br>+ <code>arpspoof -i eth0 -t 192.168.20.1 192.168.20.50</code><br>→ La victime pense que le routeur = MAC de Kali !</div>
+          <div class="msg system"><div class="msg-label">📡 Trafic Capturé</div>Kali reçoit tout le trafic de la victime → peut lire les mots de passe HTTP, sessions non chiffrées...</div>
+          <div class="msg info">🛡️ MITIGATION : Dynamic ARP Inspection (DAI)</div>
+        </div>
+        <div class="code-block" data-label="Mitigation DAI">
+<pre><span class="comment"># Activer DAI sur les VLANs concernés</span>
+<span class="cmd">SW(config)# ip arp inspection vlan 10,20,30</span>
+<span class="cmd">SW(config)# interface g0/1</span>
+<span class="cmd">SW(config-if)# ip arp inspection trust</span>
+<span class="comment"># Le port vers le routeur est trusted</span>
+<span class="comment"># Tous les autres ports → ARP validé contre la table DHCP Snooping</span>
+<span class="cmd">SW# show ip arp inspection vlan 20</span></pre>
+        </div>
+      </div>
+
+      <div class="scenario-box" style="border-color:var(--orange);">
+        <div class="scenario-title" style="color:var(--orange);">🟠 Scénario 2 : Rogue DHCP Server</div>
+        <p style="color:var(--text2);font-size:0.88rem;margin-bottom:1rem;">Un employé branche un routeur WiFi personnel sur le réseau → il devient serveur DHCP !</p>
+        <div class="scenario-chat">
+          <div class="msg attacker"><div class="msg-label">📦 PC reçoit DHCP du mauvais serveur</div>IP: 192.168.1.100 | Gateway: 192.168.1.1 (routeur de l'employé !)<br>→ L'employé peut voir tout le trafic qui passe par son routeur</div>
+          <div class="msg system"><div class="msg-label">🛡️ Protection DHCP Snooping</div>Le switch détecte un OFFER DHCP sur un port untrusted → DROP automatique ! L'employé ne peut pas distribuer d'IPs.</div>
+        </div>
+        <div class="alert alert-success" style="margin-top:1rem;">
+          <span class="alert-icon">✅</span>
+          <div><strong>DHCP Snooping</strong> est la première défense. Combiné avec <strong>Port Security</strong> pour empêcher la connexion non autorisée d'équipements, c'est un bouclier solide !</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LAB — Simulation CLI guidée ===== -->
+<div class="section" id="section-lab">
+  <div class="section-header">
+    <div class="section-title">🖥️ Labs — Simulation CLI</div>
+    <p class="section-desc">Configurez routeurs et switches comme en production : tapez les commandes IOS, le simulateur vous guide, corrige et explique chaque étape.</p>
+  </div>
+
+  <div class="sticky-note blue" style="max-width:720px;margin:0 auto 1.5rem;">
+    <strong>Mode pratique :</strong> checklist à gauche, terminal Cisco à droite. Le simulateur accepte le <strong>début des commandes</strong> (ex. <code>en</code>, <code>conf t</code>, <code>int g0/1</code>, <code>sw mode acc</code>). Lab Final = récap complet avec schéma réseau. Aide : <code>hint</code>, <code>solution</code>, <code>clear</code>.
+  </div>
+
+  <div class="content-panel" style="padding-top:1.5rem;">
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;" id="labTabs">
+      <button type="button" class="lab-tab active" data-lab="lab1">Lab 1 — Entreprise</button>
+      <button type="button" class="lab-tab" data-lab="lab2">Lab 2 — STP / LACP</button>
+      <button type="button" class="lab-tab" data-lab="lab3">Lab 3 — Sécurité</button>
+      <button type="button" class="lab-tab" data-lab="lab4">Lab 4 — Dépannage</button>
+      <button type="button" class="lab-tab lab-final-tab" data-lab="labfinal">🏆 Lab Final — Récap A→Z</button>
+    </div>
+    <div id="labTopologyPanel" class="lab-topology-panel" style="display:none;"></div>
+    <h3 id="labSimTitle" style="font-family:var(--font-hand);font-size:1.6rem;color:var(--ink);margin-bottom:1rem;"></h3>
+
+    <div class="lab-sim-wrap">
+      <aside class="lab-sim-sidebar">
+        <h4>Modules à configurer</h4>
+        <p id="labProgress" class="small muted" style="margin-bottom:0.75rem;font-family:var(--font-note);"></p>
+        <ul class="lab-checklist" id="labChecklist"></ul>
+        <div style="margin-top:1rem;">
+          <label class="small muted" style="font-family:var(--font-note);">Équipement simulé</label>
+          <select id="labDeviceSelect" style="width:100%;margin-top:4px;padding:8px;border-radius:6px;border:2px solid var(--border);font-family:'Space Mono',monospace;">
+            <option value="SW1">SW1 — Switch</option>
+            <option value="R1">R1 — Routeur</option>
+          </select>
+        </div>
+        <div class="lab-sim-actions">
+          <button type="button" class="btn btn-secondary" onclick="labSimHint()">💡 Indice</button>
+          <button type="button" class="btn btn-secondary" onclick="labSimSolution()">📋 Solution</button>
+          <button type="button" class="btn btn-primary" onclick="labSimReset()">🔄 Réinitialiser</button>
+        </div>
+      </aside>
+
+      <div>
+        <div class="lab-objective" id="labObjective"></div>
+        <div class="cli-sim">
+          <div class="cli-sim-bar">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ff5f57;display:inline-block;"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#febc2e;display:inline-block;"></span>
+            <span style="width:10px;height:10px;border-radius:50%;background:#28c840;display:inline-block;"></span>
+            <span style="margin-left:auto;font-family:'Space Mono',monospace;">Cisco IOS — Terminal Simulator</span>
+          </div>
+          <div class="cli-sim-body" id="cliOutput"></div>
+          <div class="cli-input-row">
+            <span class="cli-prompt" id="cliPromptLabel">SW1></span>
+            <input type="text" class="cli-input" id="cliInput" autocomplete="off" spellcheck="false" placeholder="Tapez une commande IOS…" />
+          </div>
+        </div>
+        <p class="lab-tuto" id="labTuto"></p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ===== RESUMES ===== -->
+<div class="section" id="section-resumes">
+  <div class="section-header">
+    <div class="section-title">📸 Résumés Visuels</div>
+    <p class="section-desc">Fiches visuelles de cours pour une révision rapide</p>
+  </div>
+
+  <div class="summary-images">
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">🏷️</span><span>img01.jpeg</span></div>
+        <img src="img01.jpeg" alt="VLAN Configuration" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">VLAN Configuration — VLAN 10,20,30,99</div>
+    </div>
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">✨</span><span>img02.jpeg</span></div>
+        <img src="img02.jpeg" alt="Avantages VLAN" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">Avantages des VLANs pour votre réseau</div>
+    </div>
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">🌉</span><span>img03.jpeg</span></div>
+        <img src="img03.jpeg" alt="STP" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">STP — Spanning Tree Protocol</div>
+    </div>
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">🔗</span><span>img04.jpeg</span></div>
+        <img src="img04.jpeg" alt="EtherChannel" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">EtherChannel — L'Agrégation Logique</div>
+    </div>
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">📡</span><span>img05.jpeg</span></div>
+        <img src="img05.jpeg" alt="DHCP et DNS" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">DHCP & DNS — Processus DORA + Résolution</div>
+    </div>
+    <div class="summary-img-card">
+      <div class="summary-img-media">
+        <div class="summary-img-placeholder"><span class="summary-img-emoji">🌍</span><span>img06.jpeg</span></div>
+        <img src="img06.jpeg" alt="DHCPv6" onload="this.parentElement.classList.add('has-image')">
+      </div>
+      <div class="summary-img-label">DHCPv6 — Processus SARR + Types</div>
+    </div>
+  </div>
+
+</div>
+
+</main>
+
+<script src="lab-simulator.js"></script>
+<script>
+// ===== NAVIGATION =====
+function showSection(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.navbar .nav-btn').forEach(b => b.classList.remove('active'));
+  const section = document.getElementById('section-' + id);
+  if (section) {
+    section.classList.add('active');
+    const navbar = document.querySelector('.navbar');
+    if (navbar) window.scrollTo({ top: navbar.offsetTop, behavior: 'smooth' });
+  }
+  const navBtn = (el && el.classList && el.classList.contains('nav-btn'))
+    ? el
+    : document.querySelector('.navbar .nav-btn[data-section="' + id + '"]');
+  if (navBtn) navBtn.classList.add('active');
+  if (id === 'lab' && typeof initLabSimulator === 'function') initLabSimulator();
+}
+
+function formatTerminalBodies() {
+  document.querySelectorAll('.terminal-body:not([data-formatted])').forEach(body => {
+    const lines = body.innerHTML.split('\n');
+    body.innerHTML = lines.map(line => {
+      const t = line.trim();
+      if (!t) return '<div class="term-line term-gap"></div>';
+      return '<div class="term-line">' + t + '</div>';
+    }).join('');
+    body.dataset.formatted = '1';
+  });
+}
+
+// ===== SUBTABS =====
+function showSubtab(section, tab, btn) {
+  const prefix = section + '-';
+  document.querySelectorAll(`#section-${section} .subcontent`).forEach(c => c.classList.remove('active'));
+  document.querySelectorAll(`#section-${section} .subtab`).forEach(b => b.classList.remove('active'));
+  const content = document.getElementById(prefix + tab);
+  if (content) content.classList.add('active');
+  const activeBtn = (btn && btn.classList && btn.classList.contains('subtab'))
+    ? btn
+    : (typeof event !== 'undefined' && event && event.target && event.target.classList && event.target.classList.contains('subtab') ? event.target : null);
+  if (activeBtn) activeBtn.classList.add('active');
+}
+
+// ===== ACCORDION =====
+function toggleAccordion(btn) {
+  btn.classList.toggle('open');
+  const body = btn.nextElementSibling;
+  body.classList.toggle('show');
+}
+
+// ===== DORA DETAIL =====
+const doraDetails = {
+  discover: { color:'var(--blue)', title:'🔍 DISCOVER — Client → Broadcast', content:`Le client n'a pas d'IP → il broadcaste sur tout le réseau pour trouver un serveur DHCP.<br><br>
+    <strong>Source IP :</strong> 0.0.0.0 (pas encore d'IP !)<br>
+    <strong>Dest IP :</strong> 255.255.255.255 (broadcast)<br>
+    <strong>Source MAC :</strong> MAC du client<br>
+    <strong>Dest MAC :</strong> FF:FF:FF:FF:FF:FF<br>
+    <strong>Port :</strong> UDP 68 (source) → 67 (dest)` },
+  offer: { color:'var(--green)', title:'🎁 OFFER — Serveur → Client', content:`Le serveur DHCP reçoit le DISCOVER et propose une adresse IP disponible.<br><br>
+    <strong>Source IP :</strong> 192.168.1.1 (IP du serveur)<br>
+    <strong>Dest IP :</strong> 255.255.255.255 (broadcast, le client n'a pas encore d'IP)<br>
+    <strong>Contient :</strong> IP proposée, masque, gateway, DNS, durée du bail` },
+  request: { color:'var(--orange)', title:'📝 REQUEST — Client → Broadcast', content:`Le client a reçu une (ou plusieurs) OFFER. Il accepte et broadcaste pour informer TOUS les serveurs de son choix.<br><br>
+    <strong>Pourquoi broadcast ?</strong> Si plusieurs serveurs DHCP ont répondu, tous doivent savoir que le client a choisi le premier → les autres retirent leur offre.<br><br>
+    <strong>Contient :</strong> IP du serveur choisi, IP demandée` },
+  ack: { color:'var(--pink)', title:'✅ ACKNOWLEDGE — Serveur → Client', content:`Le serveur confirme l'attribution définitive de l'adresse IP. Le client peut maintenant utiliser cette IP !<br><br>
+    <strong>Contient :</strong> IP attribuée, masque, gateway, DNS, durée du bail<br><br>
+    <strong>Après l'ACK :</strong> Le client configure son interface réseau et effectue un ARP gratuit pour vérifier que l'IP n'est pas déjà utilisée.` }
+};
+
+function showDoraDetail(step) {
+  const detail = doraDetails[step];
+  const box = document.getElementById('doraDetail');
+  box.style.display = 'block';
+  box.style.borderColor = `rgba(${detail.color === 'var(--blue)' ? '59,130,246' : detail.color === 'var(--green)' ? '34,197,94' : detail.color === 'var(--orange)' ? '249,115,22' : '255,107,157'},0.4)`;
+  box.innerHTML = `<h4 style="font-family:'Fredoka One',cursive;font-size:1.1rem;color:${detail.color};margin-bottom:0.8rem;">${detail.title}</h4><p style="font-size:0.88rem;color:var(--text2);line-height:1.8;">${detail.content}</p>`;
+}
+
+
+// ===== INIT =====
+window.onload = () => {
+  document.getElementById('heroSection').style.display = 'flex';
+  formatTerminalBodies();
+  if (typeof initLabSimulator === 'function') initLabSimulator();
+};
+</script>
+</body>
+</html>
